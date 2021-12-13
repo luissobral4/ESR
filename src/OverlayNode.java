@@ -11,5 +11,17 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class OverlayNode {
     private Map<int, Map<int, InetAddress>> fluxTable;
-    ReentrantLock tableLock;
+    private ReentrantLock tableLock; //Lock para gerir concorrencias no acesso à tabela
+
+
+
+
+
+    public static void main(String[] args) {
+        Thread controllerThread = new Thread
+
+        while(true){
+
+        }
+    }
 }
