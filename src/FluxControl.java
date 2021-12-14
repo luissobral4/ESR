@@ -1,4 +1,3 @@
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -52,11 +51,11 @@ public class FluxControl {
 
     public void outputConnected() {
         this.nOutputsConnected++;
-        allConnected.signal();
+        allConnected.signalAll();
     }
 
     public void packetSent() {
         nPacketsSent++;
-        allSent.signal();
+        allSent.signalAll();
     }
 }

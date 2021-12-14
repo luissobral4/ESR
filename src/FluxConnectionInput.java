@@ -1,36 +1,25 @@
 import java.io.DataInputStream;
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class FluxConnectionInput implements Runnable {
     private boolean debug = false;
     private int fluxID; //Id do fluxo que esta thread trata
-    private HashMap<int, HashMap<int, InetAddress>> fluxTable; //Tabela de mapeamento de fluxos
-    private ReentrantLock tableLock; //Lock para gerir concorrencias no acesso à tabela
+    private TableUpdatesControl tableUpdtCtrl;
     private byte[] currPacket; //Pacote atual
     private FluxControl fluxCtrl; //Objeto de controlo do fluxo
-    private boolean kill;
+    private AtomicBoolean running;
 
     public FluxConnectionInput(int fluxID,
-                               HashMap<int, HashMap<int, InetAddress>> fluxTable,
-                               ReentrantLock tableLock,boolean kill) throws IOException {
+                               TableUpdatesControl tableUpdtCtrl,
+                               AtomicBoolean running) throws IOException {
         this.fluxID = fluxID;
-
-
-        this.fluxTable = fluxTable;
-        this.tableLock = tableLock;
+        this.tableUpdtCtrl = tableUpdtCtrl;
         currPacket = new byte[1];
         currPacket[0] = 1;
-        this.kill = kill;
-    }
-
-    public void setKill(boolean kill){
-        this.kill = kill;
+        this.running = running;
     }
 
 
@@ -46,9 +35,8 @@ public class FluxConnectionInput implements Runnable {
             if(debug) System.out.println("Flux[" + fluxID + "] - Previous node connected: "
                                          + client.getInetAddress().getHostAddress());
 
-
             fluxCtrl.waitConnections();
-            while(currPacket[0] != 0 && !kill){
+            while(currPacket[0] != 0 && running.get()){
                 int count = inpStream.available();
                 currPacket = new byte[count];
                 int read = 0;
@@ -57,9 +45,7 @@ public class FluxConnectionInput implements Runnable {
             }
             if(currPacket[0] == 0){
                 if(debug) System.out.println("Flux[" + fluxID + "] - End of stream on input thread!");
-                tableLock.lock();
-                fluxTable.remove(fluxID);
-                tableLock.unlock();
+                tableUpdtCtrl.tableRemove(fluxID);
             }
             server.close();
 

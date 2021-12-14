@@ -1,46 +1,62 @@
-import java.io.*;
-import java.net.InetAddress;
-import java.net.Socket;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.atomic.AtomicBoolean;
 
-
-public class FluxConnection implements Runnable{
+public class FluxConnection implements Runnable {
+    private boolean debug = false;
     private int fluxID; //Id do fluxo que esta thread trata
-    private Socket socketIn; //Socket de receção de dados
-    private DataInputStream inpStream; //Stream de receção de dados
-    private Map<int,Map<int,InetAddress>> fluxTable; //Tabela de mapeamento de fluxos
-    private ReentrantLock tableLock; //Lock para gerir concorrencias no acesso à tabela
-    private Map<int,InetAddress> portIP; //Mapeia a porta ao ip para criar uma socket, funciona como uma lista dos próximos nodos do fluxo
-    private Map<Socket,DataOutputStream> socketDOS; //Mapeia a socket de ligação a um dos próximos nodos do fluxo com a respetiva stream de escrita
-
+    private FluxControl fluxCtrl; //Objeto de controlo do fluxo
+    private TableUpdatesControl tableUpdtCtrl; //Objeto de controlo dos updates da tabela de fluxos
 
     public FluxConnection(int fluxID,
-                          InetAddress ipIn,
-                          int portIn,
-                          Map<int,InetAddress> portIP,
-                          Map<int,Map<int,InetAddress>> fluxTable,
-                          ReentrantLock tableLock) throws IOException {
+                          int nOutputs,
+                          TableUpdatesControl tableUpdtCtrl) throws IOException {
         this.fluxID = fluxID;
-        this.socketIn = new Socket(ipIn, portIn);
-        this.inpStream = new DataInputStream(socketIn.getInputStream());
-        this.socketDOS = new HashMap<>();
-        this.portIP = portIP;
-
-        this.fluxTable = fluxTable;
-        this.tableLock = tableLock;
+        this.fluxCtrl = new FluxControl(nOutputs);
+        this.tableUpdtCtrl = tableUpdtCtrl;
     }
 
 
-
-
-
     @Override
-    public void run(){
+    public void run() {
+        try {
+            AtomicBoolean runningIn = new AtomicBoolean(true);
+            Thread inThread = new Thread(new FluxConnectionInput(fluxID,tableUpdtCtrl,runningIn));
+            inThread.start();
 
+            ArrayList<AtomicBoolean> threadList = new ArrayList<>();
+            for (Map.Entry<int, String> ent : tableUpdtCtrl.getFluxTableEntrySet(fluxID)) {
+                 AtomicBoolean runningOut = new AtomicBoolean(true);
+                 Thread outThread = new Thread(new FluxConnectionOutput(fluxCtrl, ent, debug, fluxID,runningOut));
+                 outThread.start();
+                 threadList.add(runningOut);
+            }
+            while(tableUpdtCtrl.fluxTableContains(fluxID)){
+                HashMap<int, String> tableAux = tableUpdtCtrl.getFluxTableCopy(fluxID);
+                tableUpdtCtrl.waitTableUpdated();
+
+                if (tableUpdtCtrl.hasUpdated(tableAux, fluxID)) {
+                    runningIn.set(false);
+                    for (AtomicBoolean b : threadList) {
+                        b.set(false);
+                    }
+                    runningIn = new AtomicBoolean(true);
+                    inThread = new Thread(new FluxConnectionInput(fluxID, tableUpdtCtrl, runningIn));
+                    inThread.start();
+                    threadList = new ArrayList<>();
+                    for (Map.Entry<int, String> ent : tableUpdtCtrl.getFluxTableEntrySet(fluxID)) {
+                        AtomicBoolean runningOut = new AtomicBoolean(true);
+                        Thread outThread = new Thread(new FluxConnectionOutput(fluxCtrl, ent, debug, fluxID, runningOut));
+                        outThread.start();
+                        threadList.add(runningOut);
+                    }
+                }
+            }
+        }catch (InterruptedException | IOException e) {
+            e.printStackTrace();
+        }
     }
 }
 

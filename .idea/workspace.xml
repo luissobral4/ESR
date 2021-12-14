@@ -2,32 +2,14 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="6735b2ff-4888-4fe2-bfd3-ac23f67b3bba" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/dictionaries/eduar.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/ControllerConnection.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/FluxConnectionInput.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/FluxConnectionOutput.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/FluxControl.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/TableUpdatesControl.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/TP3/Cliente$1.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/TP3/Cliente$clientTimerListener.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/TP3/Cliente$playButtonListener.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/TP3/Cliente$tearButtonListener.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/TP3/Cliente.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/TP3/RTPpacket.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/TP3/Servidor$1.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/TP3/Servidor.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/TP3/Teste$1.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/TP3/Teste$clientTimerListener.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/TP3/Teste$playButtonListener.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/TP3/Teste$serverTimerListener.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/TP3/Teste.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/TP3/VideoStream.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/TP3/movie.Mjpeg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/ControllerConnection.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/ControllerConnection.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/FluxConnection.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/FluxConnection.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/NotifyingThread.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/FluxConnectionInput.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/FluxConnectionInput.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/FluxConnectionOutput.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/FluxConnectionOutput.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/FluxControl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/FluxControl.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/OverlayNode.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/OverlayNode.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/TableUpdatesControl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/TableUpdatesControl.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -103,7 +85,19 @@
       <option name="presentableId" value="Default" />
       <updated>1637679175897</updated>
     </task>
+    <task id="LOCAL-00001" summary="Ta com bue erros/cenas a mais">
+      <created>1639426524656</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1639426524656</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Ta com bue erros/cenas a mais" />
+    <option name="LAST_COMMIT_MESSAGE" value="Ta com bue erros/cenas a mais" />
   </component>
   <component name="WindowStateProjectService">
     <state x="361" y="71" key="#Project_Structure" timestamp="1637680944587">
@@ -114,14 +108,18 @@
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state x="223" y="67" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1536.824@0.0.1536.824" timestamp="1637680932454" />
-    <state x="574" y="122" key="#com.intellij.ide.util.MemberChooser" timestamp="1638980567978">
+    <state x="574" y="122" key="#com.intellij.ide.util.MemberChooser" timestamp="1639436359173">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state x="574" y="122" key="#com.intellij.ide.util.MemberChooser/0.0.1536.824@0.0.1536.824" timestamp="1638980567978" />
+    <state x="574" y="122" key="#com.intellij.ide.util.MemberChooser/0.0.1536.824@0.0.1536.824" timestamp="1639436359173" />
     <state x="498" y="196" key="#com.intellij.ide.util.TreeClassChooserDialog" timestamp="1637680900966">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state x="498" y="196" key="#com.intellij.ide.util.TreeClassChooserDialog/0.0.1536.824@0.0.1536.824" timestamp="1637680900966" />
+    <state x="424" y="7" key="CommitChangelistDialog2" timestamp="1639426521508">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="424" y="7" key="CommitChangelistDialog2/0.0.1536.824@0.0.1536.824" timestamp="1639426521508" />
     <state width="1493" height="261" key="GridCell.Tab.0.bottom" timestamp="1637682357312">
       <screen x="0" y="0" width="1536" height="824" />
     </state>

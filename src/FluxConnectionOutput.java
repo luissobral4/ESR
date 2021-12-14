@@ -1,75 +1,22 @@
-import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.net.InetAddress;
-import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class FluxConnectionOutput implements Runnable {
-    private boolean debug = false;
-    private int fluxID; //Id do fluxo que esta thread trata
-    private HashMap<int, HashMap<int, InetAddress>> fluxTable; //Tabela de mapeamento de fluxos
-    private ReentrantLock tableLock; //Lock para gerir concorrencias no acesso à tabela
-    private FluxControl fluxCtrl; //Objeto de controlo do fluxo
-    private TableUpdatesControl tableUpdtCtrl; //Objeto de controlo dos updates da tabela de fluxos
-    private boolean kill,
-
-    public FluxConnectionOutput(int fluxID,
-                               HashMap<int, HashMap<int, InetAddress>> fluxTable,
-                               ReentrantLock tableLock, FluxControl fluxCtrl) throws IOException {
-        this.fluxID = fluxID;
-
-
-        this.fluxTable = fluxTable;
-        this.tableLock = tableLock;
-        this.fluxCtrl = fluxCtrl;
-        this.kill = false;
-    }
-
-
-    @Override
-    public void run() {
-        tableLock.lock();
-        HashMap<int,HashMap<int, InetAddress>> tableAux = (HashMap<int,HashMap<int, InetAddress>>) fluxTable.clone();
-
-
-        Thread inThread = new Thread(new FluxConnectionInput(fluxID,fluxTable,tableLock,kill));
-        inThread.start();
-
-        for (Map.Entry<int, InetAddress> ent : fluxTable.get(fluxID).entrySet()) {
-             Thread outThread = new Thread(new FluxConnectionOutputThread(fluxCtrl, ent, debug, fluxID,kill));
-             outThread.start();
-        }
-        while(fluxTable.containsKey(fluxID)){
-            try {
-                tableUpdtCtrl.tableUpdated();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            if(!fluxTable.get(fluxID).equals(tableAux.get(fluxID))){
-                tableAux = (HashMap<int, HashMap<int, InetAddress>>) fluxTable.clone();
-
-
-            }
-        }
-    }
-}
-
-
-class FluxConnectionOutputThread implements Runnable {
     private FluxControl fluxCtrl;
-    private Map.Entry<int, InetAddress> ent;
+    private Map.Entry<int, String> ent;
     private boolean debug;
     private int fluxID;
+    private AtomicBoolean running;
 
-    public FluxConnectionOutputThread(FluxControl fluxCtrl, Map.Entry<int, InetAddress> ent, boolean debug, int fluxID){
+    public FluxConnectionOutput(FluxControl fluxCtrl, Map.Entry<int, String> ent, boolean debug, int fluxID, AtomicBoolean running){
         this.fluxCtrl = fluxCtrl;
         this.ent = ent;
         this.debug = debug;
         this.fluxID = fluxID;
+        this.running = running;
     }
 
     @Override
@@ -77,7 +24,7 @@ class FluxConnectionOutputThread implements Runnable {
         boolean notConnected = true;
         DataOutputStream outStream = null;
         Socket clientSocket = null;
-        while (notConnected) {
+        while (notConnected && running.get()) {
             try {
                 clientSocket = new Socket(ent.getValue(), ent.getKey());
                 outStream = new DataOutputStream(clientSocket.getOutputStream());
@@ -94,13 +41,17 @@ class FluxConnectionOutputThread implements Runnable {
         }
 
         try {
-            while(fluxCtrl.getCurrentPacket()[0] != 0) {
+            assert outStream != null;
+            while(fluxCtrl.getCurrentPacket()[0] != 0 && running.get()) {
                 outStream.write(fluxCtrl.getCurrentPacket());
                 fluxCtrl.packetSent();
             }
             if (fluxCtrl.getCurrentPacket()[0] == 0) {
                 clientSocket.close();
                 if(debug) System.out.println("Flux[" + fluxID + "] - End of stream on Output thread!");
+            }else{
+                clientSocket.close();
+                if(debug) System.out.println("Flux[" + fluxID + "] - Output thread killed!");
             }
         } catch (IOException e) {
             e.printStackTrace();
