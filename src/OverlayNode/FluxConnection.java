@@ -1,3 +1,7 @@
+package OverlayNode;
+
+import Util.Address;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,14 +31,14 @@ public class FluxConnection implements Runnable {
             inThread.start();
 
             ArrayList<AtomicBoolean> threadList = new ArrayList<>();
-            for (Map.Entry<int, String> ent : tableUpdtCtrl.getFluxTableEntrySet(fluxID)) {
+            for (Address adr : tableUpdtCtrl.getFluxArray(fluxID)) {
                  AtomicBoolean runningOut = new AtomicBoolean(true);
-                 Thread outThread = new Thread(new FluxConnectionOutput(fluxCtrl, ent, debug, fluxID,runningOut));
+                 Thread outThread = new Thread(new FluxConnectionOutput(fluxCtrl, adr, debug, fluxID,runningOut));
                  outThread.start();
                  threadList.add(runningOut);
             }
             while(tableUpdtCtrl.fluxTableContains(fluxID)){
-                HashMap<int, String> tableAux = tableUpdtCtrl.getFluxTableCopy(fluxID);
+                ArrayList<Address> tableAux = tableUpdtCtrl.getFluxArrayCopy(fluxID);
                 tableUpdtCtrl.waitTableUpdated();
 
                 if (tableUpdtCtrl.hasUpdated(tableAux, fluxID)) {
@@ -46,9 +50,9 @@ public class FluxConnection implements Runnable {
                     inThread = new Thread(new FluxConnectionInput(fluxID, tableUpdtCtrl, runningIn));
                     inThread.start();
                     threadList = new ArrayList<>();
-                    for (Map.Entry<int, String> ent : tableUpdtCtrl.getFluxTableEntrySet(fluxID)) {
+                    for (Address adr : tableUpdtCtrl.getFluxArray(fluxID)) {
                         AtomicBoolean runningOut = new AtomicBoolean(true);
-                        Thread outThread = new Thread(new FluxConnectionOutput(fluxCtrl, ent, debug, fluxID, runningOut));
+                        Thread outThread = new Thread(new FluxConnectionOutput(fluxCtrl, adr, debug, fluxID, runningOut));
                         outThread.start();
                         threadList.add(runningOut);
                     }

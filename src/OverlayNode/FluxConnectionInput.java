@@ -1,3 +1,5 @@
+package OverlayNode;
+
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -37,11 +39,12 @@ public class FluxConnectionInput implements Runnable {
 
             fluxCtrl.waitConnections();
             while(currPacket[0] != 0 && running.get()){
-                int count = inpStream.available();
-                currPacket = new byte[count];
+                currPacket = new byte[2048];
                 int read = 0;
-                if(!(read == inpStream.read(currPacket))) break;
-                fluxCtrl.setCurrentPacket(currPacket);
+                if((read = inpStream.read(currPacket)) < 0) break;
+                byte[] trimmedPacket = new byte[read];
+                System.arraycopy(currPacket, 0, trimmedPacket, 0, read);
+                fluxCtrl.setCurrentPacket(trimmedPacket);
             }
             if(currPacket[0] == 0){
                 if(debug) System.out.println("Flux[" + fluxID + "] - End of stream on input thread!");

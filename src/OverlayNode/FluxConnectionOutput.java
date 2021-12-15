@@ -1,3 +1,7 @@
+package OverlayNode;
+
+import Util.Address;
+
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
@@ -6,14 +10,14 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class FluxConnectionOutput implements Runnable {
     private FluxControl fluxCtrl;
-    private Map.Entry<int, String> ent;
+    private Address adr;
     private boolean debug;
     private int fluxID;
     private AtomicBoolean running;
 
-    public FluxConnectionOutput(FluxControl fluxCtrl, Map.Entry<int, String> ent, boolean debug, int fluxID, AtomicBoolean running){
+    public FluxConnectionOutput(FluxControl fluxCtrl, Address adr, boolean debug, int fluxID, AtomicBoolean running){
         this.fluxCtrl = fluxCtrl;
-        this.ent = ent;
+        this.adr = adr;
         this.debug = debug;
         this.fluxID = fluxID;
         this.running = running;
@@ -26,7 +30,7 @@ public class FluxConnectionOutput implements Runnable {
         Socket clientSocket = null;
         while (notConnected && running.get()) {
             try {
-                clientSocket = new Socket(ent.getValue(), ent.getKey());
+                clientSocket = new Socket(adr.getIp(), adr.getPort());
                 outStream = new DataOutputStream(clientSocket.getOutputStream());
                 fluxCtrl.outputConnected();
                 notConnected = false;
