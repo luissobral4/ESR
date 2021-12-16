@@ -1,16 +1,11 @@
-//VideoStream
-
 import java.io.*;
 
 public class VideoStream {
 
-  FileInputStream fis; //video file
-  int frame_nb; //current frame nb
+    FileInputStream fis; //video file
+    int frame_nb; //current frame nb
 
-  //-----------------------------------
-  //constructor
-  //-----------------------------------
-  public VideoStream(String filename) throws Exception{
+    public VideoStream(String filename) throws Exception{
 
     //init variables
     fis = new FileInputStream(filename);

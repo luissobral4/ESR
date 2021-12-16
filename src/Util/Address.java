@@ -1,4 +1,8 @@
-public class Address {
+package Util;
+
+import java.io.Serializable;
+
+public class Address implements Serializable {
     private String ip;
     private int port;
 
@@ -21,5 +25,10 @@ public class Address {
 
     public int getPort() {
         return port;
+    }
+
+    @Override
+    public String toString() {
+        return "Address{" + ip + ':'+ port + '}';
     }
 }

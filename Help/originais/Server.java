@@ -29,7 +29,7 @@ public class Server extends JFrame implements ActionListener {
   //Video variables:
   //----------------
   int imagenb = 0; //image nb of the image currently transmitted
-  VideoStream video; //VideoStream object used to access video frames
+  VideoStream video; //OverlayController.VideoStream object used to access video frames
   static int MJPEG_TYPE = 26; //RTP payload type for MJPEG video
   static int FRAME_PERIOD = 100; //Frame period of the video to stream, in ms
   static int VIDEO_LENGTH = 500; //length of the video in frames
@@ -137,7 +137,7 @@ public class Server extends JFrame implements ActionListener {
 	    //Send response
 	    theServer.send_RTSP_response();
    
-	    //init the VideoStream object:
+	    //init the OverlayController.VideoStream object:
 	    theServer.video = new VideoStream(VideoFileName);
 
 	    //init RTP socket
@@ -237,7 +237,7 @@ public class Server extends JFrame implements ActionListener {
   }
 
   //------------------------------------
-  //Parse RTSP Request
+  //Parse RTSP OverlayController.Request
   //------------------------------------
   private int parse_RTSP_request()
   {

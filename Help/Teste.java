@@ -47,7 +47,7 @@ public class Teste {
   //Video constants:
   //------------------
   int imagenb = 0; //image nb of the image currently transmitted
-  VideoStream video; //VideoStream object used to access video frames
+  VideoStream video; //OverlayController.VideoStream object used to access video frames
   static int MJPEG_TYPE = 26; //RTP payload type for MJPEG video
   static int FRAME_PERIOD = 100; //Frame period of the video to stream, in ms
   static int VIDEO_LENGTH = 500; //length of the video in frames
@@ -112,7 +112,7 @@ public class Teste {
     //Get Client IP address 
     ClientIPAddr = InetAddress.getByName("127.0.0.1");
     System.out.println("Teste: vai enviar e receber video no mesmo socket " + ClientIPAddr);
-	video = new VideoStream(VideoFileName); //init the VideoStream object:
+	video = new VideoStream(VideoFileName); //init the OverlayController.VideoStream object:
     System.out.println("Teste: vai enviar e receber video da file " + VideoFileName);
 
     } catch (SocketException e) {

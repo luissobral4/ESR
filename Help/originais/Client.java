@@ -373,7 +373,7 @@ public class Client{
   }
 
   //------------------------------------
-  //Send RTSP Request
+  //Send RTSP OverlayController.Request
   //------------------------------------
 
   //.............

@@ -5,11 +5,8 @@ import Util.Address;
 import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-
-import static java.lang.Thread.sleep;
 
 public class OverlayNode{
 
@@ -45,6 +42,7 @@ public class OverlayNode{
 
                 byte[] currPacket = new byte[1024];
                 int read = in.read(currPacket);
+                System.out.println("Raw: " + currPacket);
                 if(read < 5) break;
                 byte[] trimmedPacket = new byte[read];
                 System.arraycopy(currPacket, 0, trimmedPacket, 0, read);
