@@ -13,7 +13,8 @@ import java.util.concurrent.locks.ReentrantLock;
 public class TableUpdatesControl {
     private HashMap<Integer, ArrayList<Address>> fluxTable; //Tabela de mapeamento de fluxos
     private ReentrantLock tableLock; //Lock para gerir concorrencias no acesso à tabela
-    private Condition tableUpdateCond;
+    private HashMap<Integer,ReentrantLock> tableUpdateLocks;
+    private HashMap<Integer,Condition> tableUpdateConds;
     private boolean tableUpdated;
 
     /**
@@ -21,7 +22,8 @@ public class TableUpdatesControl {
      */
     public TableUpdatesControl(){
         this.tableLock = new ReentrantLock();
-        this.tableUpdateCond = this.tableLock.newCondition();
+        this.tableUpdateLocks = new HashMap<>();
+        this.tableUpdateConds = new HashMap<>();
         this.tableUpdated = false;
 
     }
@@ -71,8 +73,13 @@ public class TableUpdatesControl {
     }
 
     public void signalTableUpdate(){
-        this.tableUpdated = true;
-        this.tableUpdateCond.signalAll();
+        for(Integer fluxId : fluxTable.keySet()) {
+            this.tableUpdateLocks.get(fluxId).lock();
+            this.tableUpdated = true;
+            this.tableUpdateConds.get(fluxId).signalAll();
+            this.tableUpdateLocks.get(fluxId).unlock();
+        }
+
     }
 
     public Set<Map.Entry<Integer, ArrayList<Address>>> getFluxTableSet(){
@@ -83,9 +90,13 @@ public class TableUpdatesControl {
     }
 
 
-    public void waitTableUpdated() throws InterruptedException {
+    public void waitTableUpdated(int fluxId) throws InterruptedException {
         while(!this.tableUpdated){
-            this.tableUpdateCond.await();
+            this.tableUpdateLocks.get(fluxId).lock();
+            System.out.println("Thread " + fluxId + "waits...");
+            this.tableUpdateConds.get(fluxId).await();
+            System.out.println("Thread " + fluxId + "resumes!");
+            this.tableUpdateLocks.get(fluxId).unlock();
         }
         this.tableUpdated = false;
     }

@@ -3,6 +3,7 @@ package OverlayNode;
 import Util.Address;
 
 import java.io.*;
+import java.lang.reflect.Array;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -32,15 +33,17 @@ public class OverlayNode{
             TableUpdatesControl tableUpdtCtrl = new TableUpdatesControl();
             System.out.println("Here!");
 
-            /*in.read(packet);
-            HashMap<Integer, HashMap<Integer,String>> read = convertToTable(packet);
-            ;
-            runFluxes(tableUpdtCtrl);*/
+            byte[] currPacket = new byte[1024];
+            in.read(currPacket);
+            HashMap<Integer, ArrayList<Address>> tab = deserialize(currPacket);
+            tableUpdtCtrl.setFluxTable(tab);
+            runFluxes(tableUpdtCtrl);
+            tableUpdtCtrl.signalTableUpdate();
             boolean first = true;
             while(true) {
                 System.out.println("[Main] - Waiting for message...");
 
-                byte[] currPacket = new byte[1024];
+
                 int read = in.read(currPacket);
                 System.out.println("Raw: " + currPacket);
                 if(read < 5) break;
@@ -48,6 +51,7 @@ public class OverlayNode{
                 System.arraycopy(currPacket, 0, trimmedPacket, 0, read);
                 tableUpdtCtrl.setFluxTable(deserialize(trimmedPacket));
 
+                tableUpdtCtrl.signalTableUpdate();
                 System.out.println("[Main] - Received " + tableUpdtCtrl.getFluxTable().toString());
                 /*if(first){
                     runFluxes(tableUpdtCtrl);
@@ -58,6 +62,7 @@ public class OverlayNode{
             }
         } catch (IOException | ClassNotFoundException e){
             e.printStackTrace();
+            System.out.println("EXCEPTION OVERLAY NODE");
         }
     }
 }

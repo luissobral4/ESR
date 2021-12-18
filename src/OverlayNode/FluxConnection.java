@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class FluxConnection implements Runnable {
-    private boolean debug = false;
+    private boolean debug = true;
     private int fluxID; //Id do fluxo que esta thread trata
     private FluxControl fluxCtrl; //Objeto de controlo do fluxo
     private TableUpdatesControl tableUpdtCtrl; //Objeto de controlo dos updates da tabela de fluxos
@@ -39,7 +39,7 @@ public class FluxConnection implements Runnable {
             }
             while(tableUpdtCtrl.fluxTableContains(fluxID)){
                 ArrayList<Address> tableAux = tableUpdtCtrl.getFluxArrayCopy(fluxID);
-                tableUpdtCtrl.waitTableUpdated();
+                tableUpdtCtrl.waitTableUpdated(fluxID);
 
                 if (tableUpdtCtrl.hasUpdated(tableAux, fluxID)) {
                     runningIn.set(false);
@@ -60,6 +60,7 @@ public class FluxConnection implements Runnable {
             }
         }catch (InterruptedException | IOException e) {
             e.printStackTrace();
+            System.out.println("EXCEPTION FLUXCONN");
         }
     }
 }

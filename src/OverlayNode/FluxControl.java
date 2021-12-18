@@ -52,12 +52,16 @@ public class FluxControl {
     }
 
     public void outputConnected() {
+        this.lock.lock();
         this.nOutputsConnected++;
         allConnected.signalAll();
+        this.lock.unlock();
     }
 
     public void packetSent() {
+        this.lock.lock();
         nPacketsSent++;
         allSent.signalAll();
+        this.lock.unlock();
     }
 }
