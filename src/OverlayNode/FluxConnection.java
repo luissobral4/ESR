@@ -31,11 +31,13 @@ public class FluxConnection implements Runnable {
             inThread.start();
 
             ArrayList<AtomicBoolean> threadList = new ArrayList<>();
+            int outId = 0;
             for (Address adr : tableUpdtCtrl.getFluxArray(fluxID)) {
                  AtomicBoolean runningOut = new AtomicBoolean(true);
-                 Thread outThread = new Thread(new FluxConnectionOutput(fluxCtrl, adr, debug, fluxID,runningOut));
+                 Thread outThread = new Thread(new FluxConnectionOutput(fluxCtrl, adr, debug, fluxID,runningOut,outId));
                  outThread.start();
                  threadList.add(runningOut);
+                 outId++;
             }
             while(tableUpdtCtrl.fluxTableContains(fluxID)){
                 ArrayList<Address> tableAux = tableUpdtCtrl.getFluxArrayCopy(fluxID);
@@ -50,11 +52,13 @@ public class FluxConnection implements Runnable {
                     inThread = new Thread(new FluxConnectionInput(fluxID, tableUpdtCtrl, runningIn));
                     inThread.start();
                     threadList = new ArrayList<>();
+                    outId = 0;
                     for (Address adr : tableUpdtCtrl.getFluxArray(fluxID)) {
                         AtomicBoolean runningOut = new AtomicBoolean(true);
-                        Thread outThread = new Thread(new FluxConnectionOutput(fluxCtrl, adr, debug, fluxID, runningOut));
+                        Thread outThread = new Thread(new FluxConnectionOutput(fluxCtrl, adr, debug, fluxID, runningOut,outId));
                         outThread.start();
                         threadList.add(runningOut);
+                        outId++;
                     }
                 }
             }

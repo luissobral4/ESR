@@ -1,6 +1,7 @@
 package OverlayController;
 
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -25,11 +26,14 @@ public class RequestListener implements Runnable{
                 Socket client = server.accept();
                 DataInputStream in = new DataInputStream(client.getInputStream());
 
+
+
                 String ip = client.getInetAddress().toString();
                 int port = client.getPort();
                 String read = in.readUTF();
 
                 Request req = new Request(parseReq(read),ip,port);
+
 
                 Thread fh = new Thread(new RequestHandler(dac,req));
                 fh.start();

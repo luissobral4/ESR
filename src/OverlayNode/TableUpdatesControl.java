@@ -21,6 +21,7 @@ public class TableUpdatesControl {
      * Método construtor
      */
     public TableUpdatesControl(){
+        this.fluxTable = new HashMap<>();
         this.tableLock = new ReentrantLock();
         this.tableUpdateLocks = new HashMap<>();
         this.tableUpdateConds = new HashMap<>();
@@ -30,6 +31,14 @@ public class TableUpdatesControl {
 
     public void setFluxTable(HashMap<Integer, ArrayList<Address>> fluxTable) {
         tableLock.lock();
+        Set<Integer> s2 = fluxTable.keySet();
+        for(Integer i : s2){
+            if(!fluxTableContains(i)){
+                this.tableUpdateLocks.put(i,new ReentrantLock());
+                this.tableUpdateConds.put(i,this.tableUpdateLocks.get(i).newCondition());
+            }
+        }
+
         this.fluxTable = (HashMap<Integer, ArrayList<Address>>) fluxTable.clone();
         tableLock.unlock();
     }
@@ -93,9 +102,9 @@ public class TableUpdatesControl {
     public void waitTableUpdated(int fluxId) throws InterruptedException {
         while(!this.tableUpdated){
             this.tableUpdateLocks.get(fluxId).lock();
-            System.out.println("Thread " + fluxId + "waits...");
+            System.out.println("Flux[" + fluxId + "] updates thread waits...");
             this.tableUpdateConds.get(fluxId).await();
-            System.out.println("Thread " + fluxId + "resumes!");
+            System.out.println("Flux[" + fluxId + "] updates thread resumes!");
             this.tableUpdateLocks.get(fluxId).unlock();
         }
         this.tableUpdated = false;

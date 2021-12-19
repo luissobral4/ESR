@@ -17,7 +17,7 @@ public class RequestHandler implements Runnable {
     @Override
     public void run() {
         try {
-            if (dac.hasFlux(request.getFluxId())) {
+            if (dac.hasFlux(request.getFluxId())){
                 dac.updateTable(request); //OverlayController.NodeConnection threads activate
             } else {
                 Socket outSocket = new Socket(dac.getFirstNodeIp(), dac.getFirstNodePort());
@@ -41,10 +41,7 @@ public class RequestHandler implements Runnable {
 
                     imagenb++;
                 }
-
-
             }
-
         } catch (Exception e) {
             e.printStackTrace();
         }

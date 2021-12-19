@@ -27,9 +27,9 @@ public class FluxConnectionInput implements Runnable {
 
     @Override
     public void run() {
-        ServerSocket server;
+        ServerSocket server = null;
         try {
-            server = new ServerSocket(8888);
+            server = new ServerSocket(1111+fluxID);
             DataInputStream inpStream;
             Socket client = server.accept();
             inpStream = new DataInputStream(client.getInputStream());
@@ -38,15 +38,15 @@ public class FluxConnectionInput implements Runnable {
                                          + client.getInetAddress().getHostAddress());
 
             fluxCtrl.waitConnections();
-            while(currPacket[0] != 0 && running.get()){
-                currPacket = new byte[2048];
+            while(currPacket.length != 1 && running.get()){
+                currPacket = new byte[16384];
                 int read = 0;
                 if((read = inpStream.read(currPacket)) < 0) break;
                 byte[] trimmedPacket = new byte[read];
                 System.arraycopy(currPacket, 0, trimmedPacket, 0, read);
                 fluxCtrl.setCurrentPacket(trimmedPacket);
             }
-            if(currPacket[0] == 0){
+            if(currPacket.length == 1){
                 if(debug) System.out.println("Flux[" + fluxID + "] - End of stream on input thread!");
                 tableUpdtCtrl.tableRemove(fluxID);
             }
@@ -56,6 +56,12 @@ public class FluxConnectionInput implements Runnable {
             e.printStackTrace();
 
             System.out.println("EXCEPTION FLUXCONNIN");
+        }
+        try {
+            assert server != null;
+            server.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }

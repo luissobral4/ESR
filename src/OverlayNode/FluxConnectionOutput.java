@@ -14,13 +14,15 @@ public class FluxConnectionOutput implements Runnable {
     private boolean debug;
     private int fluxID;
     private AtomicBoolean running;
+    private int outId;
 
-    public FluxConnectionOutput(FluxControl fluxCtrl, Address adr, boolean debug, int fluxID, AtomicBoolean running){
+    public FluxConnectionOutput(FluxControl fluxCtrl, Address adr, boolean debug, int fluxID, AtomicBoolean running, int outId){
         this.fluxCtrl = fluxCtrl;
         this.adr = adr;
         this.debug = debug;
         this.fluxID = fluxID;
         this.running = running;
+        this.outId = outId;
     }
 
     @Override
@@ -28,7 +30,7 @@ public class FluxConnectionOutput implements Runnable {
         boolean notConnected = true;
         DataOutputStream outStream = null;
         Socket clientSocket = null;
-        while (notConnected && running.get()) {
+        while(notConnected) {
             try {
                 clientSocket = new Socket(adr.getIp(), adr.getPort());
                 outStream = new DataOutputStream(clientSocket.getOutputStream());
@@ -46,18 +48,19 @@ public class FluxConnectionOutput implements Runnable {
 
         try {
             assert outStream != null;
-            while(fluxCtrl.getCurrentPacket()[0] != 0 && running.get()) {
+            while(fluxCtrl.getCurrentPacket().length != 1 && running.get()) {
+                fluxCtrl.waitNewPacket(outId);
                 outStream.write(fluxCtrl.getCurrentPacket());
                 fluxCtrl.packetSent();
             }
-            if (fluxCtrl.getCurrentPacket()[0] == 0) {
+            if (fluxCtrl.getCurrentPacket().length == 1) {
                 clientSocket.close();
                 if(debug) System.out.println("Flux[" + fluxID + "] - End of stream on Output thread!");
             }else{
                 clientSocket.close();
                 if(debug) System.out.println("Flux[" + fluxID + "] - Output thread killed!");
             }
-        } catch (IOException e) {
+        } catch (IOException | InterruptedException e) {
             e.printStackTrace();
             System.out.println("EXCEPTION FLUXCONNOUT");
         }

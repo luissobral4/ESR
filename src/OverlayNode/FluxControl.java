@@ -1,5 +1,7 @@
 package OverlayNode;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -12,6 +14,9 @@ public class FluxControl {
     private int nOutputsConnected;
     private int nPacketsSent;
     private byte[] currentPacket;
+    private HashMap<Integer,ReentrantLock> locks;
+    private HashMap<Integer,Condition> conds;
+    private boolean newPacket;
     
     /**
     * Método construtor
@@ -24,17 +29,33 @@ public class FluxControl {
         this.nOutputs = nOutputs;
         this.nOutputsConnected = 0;
         this.nPacketsSent = 0;
+        this.currentPacket = new byte[1024];
+        this.locks = new HashMap<>();
+        this.conds = new HashMap<>();
+        for (int i = 0; i < nOutputs; i++){
+            locks.put(i,new ReentrantLock());
+            conds.put(i,locks.get(i).newCondition());
+        }
+        this.newPacket = false;
     }
 
     public void setCurrentPacket(byte[] currentPacket) throws InterruptedException {
-        nPacketsSent = 0;
         this.currentPacket = currentPacket;
+        this.newPacket = true;
+        for(Integer key : conds.keySet()){
+            locks.get(key).lock();
+            conds.get(key).signal();
+            locks.get(key).unlock();
+        }
+
+        this.newPacket = false;
 
         while(!(nPacketsSent == nOutputs)){
             this.lock.lock();
             allSent.await();
             this.lock.unlock();
         }
+        nPacketsSent = 0;
     }
 
     public byte[] getCurrentPacket() {
@@ -54,14 +75,22 @@ public class FluxControl {
     public void outputConnected() {
         this.lock.lock();
         this.nOutputsConnected++;
-        allConnected.signalAll();
+        allConnected.signal();
         this.lock.unlock();
     }
 
     public void packetSent() {
         this.lock.lock();
         nPacketsSent++;
-        allSent.signalAll();
+        allSent.signal();
         this.lock.unlock();
+    }
+
+    public void waitNewPacket(int outId) throws InterruptedException {
+        while(!newPacket) {
+            this.locks.get(outId).lock();
+            this.conds.get(outId).await();
+            this.locks.get(outId).unlock();
+        }
     }
 }

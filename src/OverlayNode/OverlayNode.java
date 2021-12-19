@@ -37,8 +37,8 @@ public class OverlayNode{
             in.read(currPacket);
             HashMap<Integer, ArrayList<Address>> tab = deserialize(currPacket);
             tableUpdtCtrl.setFluxTable(tab);
-            runFluxes(tableUpdtCtrl);
             tableUpdtCtrl.signalTableUpdate();
+            runFluxes(tableUpdtCtrl);
             boolean first = true;
             while(true) {
                 System.out.println("[Main] - Waiting for message...");
