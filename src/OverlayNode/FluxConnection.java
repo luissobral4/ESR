@@ -18,7 +18,7 @@ public class FluxConnection implements Runnable {
                           int nOutputs,
                           TableUpdatesControl tableUpdtCtrl) throws IOException {
         this.fluxID = fluxID;
-        this.fluxCtrl = new FluxControl(nOutputs);
+        this.fluxCtrl = new FluxControl(debug,nOutputs,fluxID);
         this.tableUpdtCtrl = tableUpdtCtrl;
     }
 
@@ -27,39 +27,54 @@ public class FluxConnection implements Runnable {
     public void run() {
         try {
             AtomicBoolean runningIn = new AtomicBoolean(true);
-            Thread inThread = new Thread(new FluxConnectionInput(fluxID,tableUpdtCtrl,runningIn));
+            Thread inThread = new Thread(new FluxConnectionInput(fluxID,tableUpdtCtrl,fluxCtrl,runningIn));
             inThread.start();
 
-            ArrayList<AtomicBoolean> threadList = new ArrayList<>();
+            HashMap<Address,AtomicBoolean> threadBools = new HashMap<>();
             int outId = 0;
+
+            HashMap<Address,Integer> currOutputs = new HashMap<>();
             for (Address adr : tableUpdtCtrl.getFluxArray(fluxID)) {
                  AtomicBoolean runningOut = new AtomicBoolean(true);
                  Thread outThread = new Thread(new FluxConnectionOutput(fluxCtrl, adr, debug, fluxID,runningOut,outId));
                  outThread.start();
-                 threadList.add(runningOut);
+                 threadBools.put(adr,runningOut);
+                 currOutputs.put(adr,outId);
                  outId++;
             }
             while(tableUpdtCtrl.fluxTableContains(fluxID)){
                 ArrayList<Address> tableAux = tableUpdtCtrl.getFluxArrayCopy(fluxID);
                 tableUpdtCtrl.waitTableUpdated(fluxID);
 
-                if (tableUpdtCtrl.hasUpdated(tableAux, fluxID)) {
-                    runningIn.set(false);
-                    for (AtomicBoolean b : threadList) {
-                        b.set(false);
+
+                ArrayList<Address> fArr = tableUpdtCtrl.getFluxArrayCopy(fluxID);
+                ArrayList<Address> removals = new ArrayList<>();
+                ArrayList<Address> aditions = new ArrayList<>();
+                for(Address a : currOutputs.keySet()) {
+                    if(!fArr.contains(a)){
+                        removals.add(a);
                     }
-                    runningIn = new AtomicBoolean(true);
-                    inThread = new Thread(new FluxConnectionInput(fluxID, tableUpdtCtrl, runningIn));
-                    inThread.start();
-                    threadList = new ArrayList<>();
-                    outId = 0;
-                    for (Address adr : tableUpdtCtrl.getFluxArray(fluxID)) {
+                    else fArr.remove(a);
+                }
+                for(Address a : fArr){
+                    if(!currOutputs.containsKey(a)){
+                        aditions.add(a);
+                    }
+                }
+
+
+                if(tableUpdtCtrl.hasUpdated(tableAux, fluxID)){
+                    for (Address a : removals) {
+                        threadBools.get(a).set(false);
+                    }
+                    for (Address adr : aditions) {
                         AtomicBoolean runningOut = new AtomicBoolean(true);
                         Thread outThread = new Thread(new FluxConnectionOutput(fluxCtrl, adr, debug, fluxID, runningOut,outId));
                         outThread.start();
-                        threadList.add(runningOut);
+                        threadBools.put(adr, runningOut);
                         outId++;
                     }
+
                 }
             }
         }catch (InterruptedException | IOException e) {

@@ -2,14 +2,16 @@ package OverlayNode;
 
 import Util.Address;
 
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 
-public class Test2 {
+public class ControllerTest {
 
     public static byte[] serialize(HashMap<Integer, ArrayList<Address>> obj) throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -18,19 +20,22 @@ public class Test2 {
         return out.toByteArray();
     }
     public static void main(String[] args) throws IOException {
-        ServerSocket server = new ServerSocket(6666);
+        ServerSocket server = new ServerSocket(5555);
 
         System.out.println("Waiting connection...");
         Socket client = server.accept();
 
         System.out.println("Connected!");
-        DataInputStream in = new DataInputStream(client.getInputStream());
+        DataOutputStream out = new DataOutputStream(client.getOutputStream());
 
+        HashMap<Integer, ArrayList<Address>> map = new HashMap<>();
+        ArrayList<Address> adr = new ArrayList<>();
+        adr.add(new Address("127.0.0.1",6666));
+        adr.add(new Address("127.0.0.1",6667));
+        map.put(0,adr);
+        byte[] packet = serialize(map);
+        out.write(packet);
 
-        byte[] packet = new byte[2048];
-        in.read(packet);
-
-        System.out.println(Arrays.toString(packet));
         while(true);
     }
 }

@@ -37,7 +37,6 @@ public class OverlayNode{
             in.read(currPacket);
             HashMap<Integer, ArrayList<Address>> tab = deserialize(currPacket);
             tableUpdtCtrl.setFluxTable(tab);
-            tableUpdtCtrl.signalTableUpdate();
             runFluxes(tableUpdtCtrl);
             boolean first = true;
             while(true) {
