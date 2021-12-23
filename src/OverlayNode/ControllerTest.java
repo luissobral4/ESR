@@ -10,6 +10,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Scanner;
 
 public class ControllerTest {
 
@@ -35,7 +36,12 @@ public class ControllerTest {
         map.put(0,adr);
         byte[] packet = serialize(map);
         out.write(packet);
-
+        Scanner in = new Scanner(System.in);
+        in.nextLine();
+        adr.remove(new Address("127.0.0.1",6667));
+        System.out.println(map.toString());
+        packet = serialize(map);
+        out.write(packet);
         while(true);
     }
 }

@@ -44,26 +44,32 @@ public class FluxConnection implements Runnable {
             }
             while(tableUpdtCtrl.fluxTableContains(fluxID)){
                 ArrayList<Address> tableAux = tableUpdtCtrl.getFluxArrayCopy(fluxID);
+                System.out.println("Flux["+fluxID+"] Table updates thread: Waiting for updates");
                 tableUpdtCtrl.waitTableUpdated(fluxID);
-
+                System.out.println("Flux["+fluxID+"] Table updates thread: Received update");
 
                 ArrayList<Address> fArr = tableUpdtCtrl.getFluxArrayCopy(fluxID);
                 ArrayList<Address> removals = new ArrayList<>();
                 ArrayList<Address> aditions = new ArrayList<>();
-                for(Address a : currOutputs.keySet()) {
-                    if(!fArr.contains(a)){
-                        removals.add(a);
-                    }
-                    else fArr.remove(a);
-                }
-                for(Address a : fArr){
-                    if(!currOutputs.containsKey(a)){
-                        aditions.add(a);
-                    }
-                }
+
+
 
 
                 if(tableUpdtCtrl.hasUpdated(tableAux, fluxID)){
+                    for(Address a : currOutputs.keySet()) {
+                        if(!fArr.contains(a)){
+                            removals.add(a);
+                        }
+                        else fArr.remove(a);
+                    }
+                    for(Address a : fArr){
+                        if(!currOutputs.containsKey(a)){
+                            aditions.add(a);
+                        }
+                    }
+                    System.out.println("Flux["+fluxID+"] Table updates thread: \n    Aditions:"+aditions.toString()+"\n    Removals:"+removals.toString());
+
+
                     for (Address a : removals) {
                         threadBools.get(a).set(false);
                     }
@@ -75,6 +81,8 @@ public class FluxConnection implements Runnable {
                         outId++;
                     }
 
+                }else{
+                    System.out.println("Flux["+fluxID+"] Table updates thread: No updates to this flux");
                 }
             }
         }catch (InterruptedException | IOException e) {

@@ -12,7 +12,7 @@ public class NodeListener implements Runnable{
 
 
     public NodeListener(DataAccessControl dac){
-        this.dac = dac = new DataAccessControl();
+        this.dac = dac;
     }
 
 
@@ -23,12 +23,12 @@ public class NodeListener implements Runnable{
             ServerSocket server = new ServerSocket(5555);
 
             while(true){
-                System.out.println("[OverlayController.NodeListener] - Waiting connection...");
+                System.out.println("Node Listener: Waiting connection...");
                 Socket client = server.accept();
-                System.out.println("[OverlayController.NodeListener] - Node at " + client.getInetAddress() + ":" + client.getPort() + " connected!");
+                System.out.println("Node Listener: Node at " + client.getInetAddress().getHostAddress() + ":" + client.getPort() + " connected!");
                 DataOutputStream out = new DataOutputStream(client.getOutputStream());
 
-                String ip = client.getInetAddress().toString();
+                String ip = client.getInetAddress().getHostAddress();
                 int port = client.getPort();
                 int nodeId = dac.nodeAdd(new Address(ip,port));
 

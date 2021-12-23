@@ -15,9 +15,8 @@ public class FluxControl {
 
     private ReentrantLock lockConn;
     private Condition allConnected;
-    private boolean inputConnected;
-    private int nOutputs;
     private int nOutputsConnected;
+    private ReentrantLock nOutputsConnectedLock;
 
     private ReentrantLock lockAllSent;
     private Condition condAllSent;
@@ -38,9 +37,8 @@ public class FluxControl {
         this.fluxID = fluxID;
         this.lockConn = new ReentrantLock();
         this.allConnected = this.lockConn.newCondition();
-        this.inputConnected = false;
-        this.nOutputs = nOutputs;
         this.nOutputsConnected = 0;
+        this.nOutputsConnectedLock = new ReentrantLock();
         this.nPacketsSent = 0;
         this.lockPacket = new ReentrantLock();
         this.currentPacket = new byte[1024];
@@ -51,43 +49,33 @@ public class FluxControl {
         this.newPacket = new AtomicBoolean(false);
     }
 
-    public void setCurrentPacket(byte[] currentPacket) throws InterruptedException {
-        lockPacket.lock();
-        nPacketsSent = 0;
-        this.currentPacket = currentPacket;
-        newPacket.set(true);
-        if(debug) System.out.println("Flux["+ fluxID +"] Input thread: New packet received, waking up all output threads...");
-        locksWaitAllSentOut = new HashMap<>();
-        condsWaitAllSentOut = new HashMap<>();
-        for(Integer key : waitMsgConds.keySet()){
-            waitMsgLocks.get(key).lock();
-            waitMsgConds.get(key).signal();
-            waitMsgLocks.get(key).unlock();
-        }
-        if(debug) System.out.println("Flux["+ fluxID +"] Input thread: signaled all output threads wake!");
-        this.lockPacket.unlock();
+    public void removeOut(){
+        nOutputsConnectedLock.lock();
+        nOutputsConnected--;
+        nOutputsConnectedLock.unlock();
     }
 
 
     public void waitConnections() throws InterruptedException {
-        inputConnected = true;
         while(nOutputsConnected < 1){
             this.lockConn.lock();
-            if(debug) System.out.println("Flux["+ fluxID +"] Input thread: waiting for a connection to be set...");
+            if(debug) System.out.println("Flux["+fluxID+"] Input thread: waiting for a connection to be set...");
             allConnected.await();
             this.lockConn.unlock();
         }
-        if(debug) System.out.println("Flux["+ fluxID +"] Input thread: At least one connection set!");
+        if(debug) System.out.println("Flux["+fluxID+"] Input thread: At least one connection set!");
     }
 
     public void outputConnected(String ip, int port, int outId) {
         this.lockConn.lock();
         this.waitMsgLocks.put(outId,new ReentrantLock());
         this.waitMsgConds.put(outId,waitMsgLocks.get(outId).newCondition());
+        nOutputsConnectedLock.lock();
         this.nOutputsConnected++;
+        nOutputsConnectedLock.unlock();
         allConnected.signal();
         this.lockConn.unlock();
-        if(debug) System.out.println("Flux["+ fluxID +"] Output thread(" + ip + ":" + port + "): Connected!");
+        if(debug) System.out.println("Flux["+ fluxID +"] Output thread("+ip+":"+port+"): Connected!");
     }
 
     public byte[] getCurrentPacket() {
@@ -98,11 +86,29 @@ public class FluxControl {
     }
 
 
+    public void setCurrentPacket(byte[] currentPacket) throws InterruptedException {
+        lockPacket.lock();
+        nPacketsSent = 0;
+        this.currentPacket = currentPacket;
+        newPacket.set(true);
+        if(debug) System.out.println("Flux["+fluxID+"] Input thread: New packet received, waking up all output threads...");
+        locksWaitAllSentOut = new HashMap<>();
+        condsWaitAllSentOut = new HashMap<>();
+        for(Integer key : waitMsgConds.keySet()){
+            waitMsgLocks.get(key).lock();
+            waitMsgConds.get(key).signal();
+            waitMsgLocks.get(key).unlock();
+        }
+        if(debug) System.out.println("Flux["+fluxID+"] Input thread: signaled all output threads wake!");
+        this.lockPacket.unlock();
+    }
+
+
     public boolean packetSent(String ip, int port, int outId) {
         boolean last = false;
         lockAllSent.lock();
         nPacketsSent++;
-        if(debug) System.out.println("Flux["+ fluxID +"] Output thread(" + ip + ":" + port + "): Packet sent " + nPacketsSent + "/" + nOutputs + "!");
+        if(debug) System.out.println("Flux["+fluxID+"] Output thread("+ip+":"+port+"): Packet sent "+nPacketsSent+"/"+nOutputsConnected+"!");
         if(nPacketsSent == nOutputsConnected){
             last = true;
             newPacket.set(false);
@@ -125,28 +131,28 @@ public class FluxControl {
     public void waitNewPacket(String ip, int port,int outId) throws InterruptedException {
         while((!newPacket.get())){
             waitMsgLocks.get(outId).lock();
-            if(debug) System.out.println("Flux["+ fluxID +"] Output thread(" + ip + ":" + port + "): Waiting for new packet...");
+            if(debug) System.out.println("Flux["+fluxID+"] Output thread("+ip+":"+port+"): Waiting for new packet...");
             waitMsgConds.get(outId).await();
             waitMsgLocks.get(outId).unlock();
         }
-        if(debug) System.out.println("Flux["+ fluxID +"] Output thread(" + ip + ":" + port + "): Notified of new packet!");
+        if(debug) System.out.println("Flux["+fluxID+"] Output thread("+ip+":"+port+"): Notified of new packet!");
     }
 
     public void waitAllSent() throws InterruptedException {
         while(!(nPacketsSent == nOutputsConnected)){
             lockAllSent.lock();
-            if(debug) System.out.println("Flux["+ fluxID +"] Input thread: Waiting for all output threads to send current packet...");
+            if(debug) System.out.println("Flux["+fluxID+"] Input thread: Waiting for all output threads to send current packet...");
             condAllSent.await();
             lockAllSent.unlock();
         }
-        if(debug) System.out.println("Flux["+ fluxID +"] Input thread: All packets sent resuming");
+        if(debug) System.out.println("Flux["+fluxID+"] Input thread: All packets sent. Resuming!");
 
     }
 
     public void waitAllSentOut(String ip, int port, int outId) throws InterruptedException {
         while(!(nPacketsSent == nOutputsConnected)){
             locksWaitAllSentOut.get(outId).lock();
-            if(debug) System.out.println("Flux["+ fluxID +"] Output thread(" + ip + ":" + port + ") waiting for all output threads to send current packet...");
+            if(debug) System.out.println("Flux["+fluxID+"] Output thread("+ip+":"+port+") waiting for all output threads to send current packet...");
             condsWaitAllSentOut.get(outId).await();
             locksWaitAllSentOut.get(outId).unlock();
         }

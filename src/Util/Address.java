@@ -1,6 +1,7 @@
 package Util;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 public class Address implements Serializable {
     private String ip;
@@ -30,5 +31,19 @@ public class Address implements Serializable {
     @Override
     public String toString() {
         return "Address{" + ip + ':'+ port + '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Address address = (Address) o;
+        return port == address.port &&
+                Objects.equals(ip, address.ip);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(ip, port);
     }
 }

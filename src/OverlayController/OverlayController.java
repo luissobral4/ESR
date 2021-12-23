@@ -4,10 +4,10 @@ public class OverlayController {
     public static void main(String[] args) {
         DataAccessControl dac = new DataAccessControl();
 
-        Thread t = new Thread(new NodeListener(dac));
-        t.start();
+        Thread nl = new Thread(new NodeListener(dac));
+        nl.start();
 
-        RequestListener ch = new RequestListener(dac);
+        ClientListener ch = new ClientListener(dac);
         ch.run();
     }
 

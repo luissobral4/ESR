@@ -40,6 +40,7 @@ public class TableUpdatesControl {
         }
 
         this.fluxTable = (HashMap<Integer, ArrayList<Address>>) fluxTable.clone();
+        System.out.println("New Flux Table: "+fluxTable.toString());
         tableLock.unlock();
     }
 
@@ -61,7 +62,7 @@ public class TableUpdatesControl {
         tableLock.lock();
         boolean ret = tableAux.equals(fluxTable.get(fluxID));
         tableLock.unlock();
-        return ret;
+        return !ret;
     }
 
     public void tableRemove(int fluxID){

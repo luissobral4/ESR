@@ -24,12 +24,16 @@ public class NodeHandler implements Runnable{
             out.write(currByteArr);
             out.flush();
             while(dac.isAlive()){
-                dac.waitTableUpdate();
+                dac.waitTableUpdate(nodeId);
+                System.out.println("\n\nNode handler: Table updated!\n\n");
                 if (!Arrays.equals(currByteArr, dac.getByteArrayTable(nodeId))) {
                     currByteArr = dac.getByteArrayTable(nodeId);
                     out.write(currByteArr);
+                    System.out.println("Sent: "+ Arrays.toString(currByteArr));
                     out.flush();
                 }
+                boolean last = dac.nodeUpdated(nodeId);
+                if(!last) dac.waitAllUpdatedNode(nodeId);
             }
         }catch (IOException | InterruptedException e) {
                 e.printStackTrace();

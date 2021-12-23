@@ -8,9 +8,9 @@ import java.io.IOException;
 import java.util.*;
 
 public class Graph {
-    private HashMap<Address,Integer> nodeIpMap;
-    private HashMap<Address,Integer> clientNodeMap;
-    private int serverNode;
+    private HashMap<String,Integer> nodeIpMap;
+    private HashMap<String,Integer> clientNodeMap;
+    private int firstNode;
     private ArrayList<ArrayList<Integer>> graph;
     private int[][] shortestPathMatrix;
     private int ver;
@@ -27,24 +27,35 @@ public class Graph {
 
     }
 
-    public Address nodeGetAddress(int node){
-        Address adr = null;
-        for(Map.Entry<Address, Integer> ent : nodeIpMap.entrySet()){
+    public String nodeGetIp(int node){
+        String ip = null;
+        for(Map.Entry<String, Integer> ent : nodeIpMap.entrySet()){
             if(ent.getValue() == node){
-                adr = ent.getKey();
+                ip = ent.getKey();
             }
         }
-        return adr;
+        if(ip == null) {
+            for (Map.Entry<String, Integer> ent : clientNodeMap.entrySet()) {
+                if (ent.getValue() == node) {
+                    ip = ent.getKey();
+                }
+            }
+        }
+        System.out.println("IPPPP:"+ip);
+        return ip;
     }
 
-    public int[] getNodesFromIps(HashMap<Integer,Address> map){
+    public int[] getNodesFromIps(HashMap<Integer,Address> map, String clientIp){
+        System.out.println("All Ips: "+map.toString());
         Collection<Address> values = map.values();
-
-        int[] arrOfNodes = new int[values.size()];
-
-        int i = 0;
+        System.out.println("All Ips2: "+values.toString());
+        int[] arrOfNodes = new int[values.size()+1];
+        arrOfNodes[0] = clientNodeMap.get(clientIp);
+        int i = 1;
+        System.out.println("Nodeipmap: "+nodeIpMap.toString());
         for(Address val : values){
-            arrOfNodes[i] = nodeIpMap.get(val);
+            arrOfNodes[i] = nodeIpMap.get(val.getIp());
+            i++;
         }
 
         return arrOfNodes;
@@ -58,25 +69,29 @@ public class Graph {
         return ver;
     }
 
-    public HashMap<Address,Integer> getNodeIpMap() {
-        return nodeIpMap;
-    }
-
-    public HashMap<Address, Integer> getClientNodeMap() {
-        return clientNodeMap;
-    }
-
-    public void nodeIpMapPut(int value, Address key) {
+    public void nodeIpMapPut(int value, String key) {
         this.nodeIpMap.put(key, value);
     }
 
-    public void clientNodeMapPut(Address key, int value) {
+    public void clientNodeMapPut(String key, int value) {
         this.clientNodeMap.put(key, value);
     }
 
+    public Address getFirstNodeAddress() {
+        String ip = null;
+        for(String key : nodeIpMap.keySet()){
+            if(nodeIpMap.get(key) == firstNode){
+                ip = key;
+                break;
+            }
+        }
+        System.out.println("ip: "+ip);
 
-    public void setServerNode(int serverNode) {
-        this.serverNode = serverNode;
+        return new Address(ip,4444);
+    }
+
+    public void setFirstNode(int firstNode) {
+        this.firstNode = firstNode;
     }
 
     public void addEdge(int u, int v) {
@@ -119,10 +134,9 @@ public class Graph {
                     mode++;
                 } else if (mode == 0) {
                     String[] spl1 = line.split(" ");
-                    String[] spl2 = spl1[1].split(":");
-                    g.nodeIpMapPut(Integer.parseInt(spl1[0]), new Address(spl2[0],Integer.parseInt(spl2[1])));
+                    g.nodeIpMapPut(Integer.parseInt(spl1[0]), spl1[1]);
                 } else if (mode == 3) {
-                    g.setServerNode(Integer.parseInt(line));
+                    g.setFirstNode(Integer.parseInt(line));
                 } else {
                     String[] spl1 = line.split(" ");
                     String[] spl2 = spl1[1].split(",");
@@ -130,9 +144,7 @@ public class Graph {
                         if (mode == 1) {
                             g.addEdge(Integer.parseInt(n), Integer.parseInt(spl1[0]));
                         } else {
-                            assert g != null;
-                            String[] spl3 = n.split(":");
-                            g.clientNodeMapPut(new Address(spl3[0],Integer.parseInt(spl3[1])), Integer.parseInt(spl1[0]));
+                            g.clientNodeMapPut(n, Integer.parseInt(spl1[0]));
                         }
                     }
                 }
@@ -166,7 +178,7 @@ public class Graph {
         return "Graph:" +
                 "\n\nnodeIpMap: \n" + nodeIpMap +
                 "\n\nclientNodeMap: \n" + clientNodeMap +
-                "\n\nserverNode: \n" + serverNode +
+                "\n\nfirstNode: \n" + firstNode +
                 "\n\ngraph: \n" + graph +
                 "\n\nshortestPathMatrix: \n" + matrixToString(shortestPathMatrix, ver) +
                 "\n\nver: " + ver;
@@ -177,12 +189,12 @@ public class Graph {
         Vertex from = null;
         Vertex to = null;
         ArrayList<Vertex> vl = new ArrayList<>();
-        for(int i = 0; i < v; i++){
-            Vertex aux = new Vertex(overlayNodes[i]);
-            if(overlayNodes[i] == serverNode){
+        for (int overlayNode : overlayNodes) {
+            Vertex aux = new Vertex(overlayNode);
+            if (overlayNode == firstNode) {
                 from = aux;
             }
-            if(overlayNodes[i] == toi){
+            if (overlayNode == toi) {
                 to = aux;
             }
             vl.add(aux);
@@ -209,22 +221,23 @@ public class Graph {
     }
 
     public int getClientNode(Address adr) {
-        return clientNodeMap.get(adr);
+        return clientNodeMap.get(adr.getIp());
     }
 
     public Integer getOverlayNode(Address adr) {
-        return nodeIpMap.get(adr);
+        return nodeIpMap.get(adr.getIp());
     }
 
 
     class Vertex implements Comparable<Vertex>{
         public final int node;
         public Edge[] adjacencies;
-        public double minDistance = Double.POSITIVE_INFINITY;
+        public double minDistance;
         public Vertex previous;
 
         public Vertex(int n){
             node = n;
+            minDistance = Double.POSITIVE_INFINITY;
         }
 
         public int getNode() {
@@ -241,7 +254,6 @@ public class Graph {
 
     }
 
-
     class Edge{
         public final Vertex target;
         public final double weight;
@@ -255,13 +267,12 @@ public class Graph {
     static class Dijkstra{
         public static void computePaths(Vertex source){
             source.minDistance = 0.;
-            PriorityQueue<Vertex> vertexQueue = new PriorityQueue<Vertex>();
+            PriorityQueue<Vertex> vertexQueue = new PriorityQueue<>();
             vertexQueue.add(source);
 
             while (!vertexQueue.isEmpty()) {
                 Vertex u = vertexQueue.poll();
 
-                // Visit each edge exiting u
                 for (Edge e : u.adjacencies)
                 {
                     Vertex v = e.target;
@@ -279,7 +290,7 @@ public class Graph {
         }
 
         public static int[] getShortestPathTo(Vertex target){
-            List<Vertex> path = new ArrayList<Vertex>();
+            List<Vertex> path = new ArrayList<>();
             for (Vertex vertex = target; vertex != null; vertex = vertex.previous)
                 path.add(vertex);
 
@@ -293,17 +304,4 @@ public class Graph {
         }
     }
 
-
-
-
-    /* Driver Code
-    public static void main(String[] args) {
-        String inputFile = "D:\\Coisas\\Aulinhas\\ESR\\src\\Util\\teste.txt";
-        Graph g = importGraph(inputFile);
-        assert g != null;
-        System.out.println(g.toString());
-        int[] aux = new int[]{0,1,2,3,5,6,8,11,10};
-        g.getOverlayShortestPath(aux, 10);
-
-    }*/
 }

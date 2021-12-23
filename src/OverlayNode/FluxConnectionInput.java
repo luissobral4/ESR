@@ -31,7 +31,7 @@ public class FluxConnectionInput implements Runnable {
     public void run() {
         ServerSocket server = null;
         try {
-            server = new ServerSocket(4242+fluxID);
+            server = new ServerSocket(4444+fluxID);
             DataInputStream inpStream;
             Socket client = server.accept();
             inpStream = new DataInputStream(client.getInputStream());
@@ -45,7 +45,7 @@ public class FluxConnectionInput implements Runnable {
             while(trimmedPacket.length != 1 && running.get()){
                 currPacket = new byte[16384];
                 int read = 0;
-                System.out.println("Flux[\" + fluxID + \"] - Input read: Waiting for new packet...");
+                System.out.println("Flux[" + fluxID + "] - Input thread: Waiting for new packet...");
                 if((read = inpStream.read(currPacket)) < 0) break;
                 trimmedPacket = new byte[read];
                 System.arraycopy(currPacket, 0, trimmedPacket, 0, read);

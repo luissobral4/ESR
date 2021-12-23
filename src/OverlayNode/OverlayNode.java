@@ -6,6 +6,7 @@ import java.io.*;
 import java.lang.reflect.Array;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,10 +18,12 @@ public class OverlayNode{
         return (HashMap<Integer, ArrayList<Address>>) is.readObject();
     }
 
-    public static void runFluxes(TableUpdatesControl tableUpdtCtrl) throws IOException {
+    public static void runFluxes(TableUpdatesControl tableUpdtCtrl,HashMap<Integer, ArrayList<Address>> old) throws IOException {
         for(Map.Entry<Integer, ArrayList<Address>> ent : tableUpdtCtrl.getFluxTableSet()){
-            Thread flux = new Thread(new FluxConnection(ent.getKey(),ent.getValue().size(),tableUpdtCtrl));
-            flux.start();
+            if(!old.containsKey(ent.getKey())) {
+                Thread flux = new Thread(new FluxConnection(ent.getKey(), ent.getValue().size(), tableUpdtCtrl));
+                flux.start();
+            }
         }
     }
 
@@ -33,30 +36,28 @@ public class OverlayNode{
             TableUpdatesControl tableUpdtCtrl = new TableUpdatesControl();
             System.out.println("Here!");
 
-            byte[] currPacket = new byte[1024];
-            in.read(currPacket);
-            HashMap<Integer, ArrayList<Address>> tab = deserialize(currPacket);
-            tableUpdtCtrl.setFluxTable(tab);
-            runFluxes(tableUpdtCtrl);
-            boolean first = true;
+            byte[] currPacket = new byte[16384];
+            int read = 0;
+            if((read = in.read(currPacket)) < 0) return;
+            byte[] trimmedPacket = new byte[read];
+            System.arraycopy(currPacket, 0, trimmedPacket, 0, read);
+
+            HashMap<Integer, ArrayList<Address>> aux = tableUpdtCtrl.getFluxTable();
+            tableUpdtCtrl.setFluxTable(deserialize(trimmedPacket));
+            runFluxes(tableUpdtCtrl,aux);
             while(true) {
-                System.out.println("[Main] - Waiting for message...");
-
-
-                int read = in.read(currPacket);
-                System.out.println("Raw: " + currPacket);
+                System.out.println("Main thread: Waiting for message...");
+                read = in.read(currPacket);
                 if(read < 5) break;
-                byte[] trimmedPacket = new byte[read];
+                trimmedPacket = new byte[read];
                 System.arraycopy(currPacket, 0, trimmedPacket, 0, read);
-                tableUpdtCtrl.setFluxTable(deserialize(trimmedPacket));
 
+                aux = tableUpdtCtrl.getFluxTable();
+                tableUpdtCtrl.setFluxTable(deserialize(trimmedPacket));
+                runFluxes(tableUpdtCtrl,aux);
                 tableUpdtCtrl.signalTableUpdate();
-                System.out.println("[Main] - Received " + tableUpdtCtrl.getFluxTable().toString());
-                /*if(first){
-                    runFluxes(tableUpdtCtrl);
-                    first = false;
-                }
-                else tableUpdtCtrl.signalTableUpdate();*/
+
+                System.out.println("Main thread: Received " + tableUpdtCtrl.getFluxTable().toString());
 
             }
         } catch (IOException | ClassNotFoundException e){

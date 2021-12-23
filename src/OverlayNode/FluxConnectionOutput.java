@@ -65,8 +65,10 @@ public class FluxConnectionOutput implements Runnable {
                 if(debug) System.out.println("Flux[" + fluxID + "] - Output thread killed!");
             }
         } catch (IOException | InterruptedException e) {
+            fluxCtrl.removeOut();
             e.printStackTrace();
             System.out.println("EXCEPTION FLUXCONNOUT");
         }
+        fluxCtrl.removeOut();
     }
 }
