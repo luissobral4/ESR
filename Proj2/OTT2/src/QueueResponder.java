@@ -34,11 +34,15 @@ public class QueueResponder implements Runnable{
             String type = headers[1];
             String data = headers[2];
 
-            Socket socket = new Socket(ip, 8080);
-            DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+            Socket socket = null;
+            DataOutputStream out = null;
 
             //pedir conexao
             if(type.equals("1")) {
+                //Socket socket = new Socket(ip, 8080);
+                socket =  new Socket("127.0.0.1", 6666);
+                out = new DataOutputStream(socket.getOutputStream());
+
                 String adj = "";
                 boolean clientNode = g.isCliente(ip);
                 if (clientNode) {
@@ -56,9 +60,9 @@ public class QueueResponder implements Runnable{
                     clientNode = g.isCliente(route[1]);
                     String ip1 = "";
                     if(clientNode)
-                      ip1 = g.cliGetIP(route[1]);
+                        ip1 = g.cliGetIP(route[1]);
                     else
-                      ip1 = g.nodeGetIP(route[1]);
+                        ip1 = g.nodeGetIP(route[1]);
 
                     queue.put(ip1+":3:"+routeID);
                 } else
@@ -66,8 +70,13 @@ public class QueueResponder implements Runnable{
 
                 out.writeUTF("2:"+adj);
                 out.flush();
-                //definir rota
+                socket.close();
+             //definir rota
             } else if(type.equals("3")){
+                //Socket socket = new Socket(ip, 8080);
+                socket =  new Socket("127.0.0.1", 6666);
+                out = new DataOutputStream(socket.getOutputStream());
+
                 int roteID = Integer.valueOf(data);
                 l.lock();
                 String route = g.routeToString(routesMap.get(roteID));
@@ -75,11 +84,27 @@ public class QueueResponder implements Runnable{
                 System.out.println("DEBUG ROTA "+route);
                 out.writeUTF("4:"+data+":"+route);
                 out.flush();
+                socket.close();
+             //responder a pedido de stream
             } else if(type.equals("5")){
-                  System.out.println("DEBUG PEDIDO STREAM!");
+                //Socket socket = new Socket(ip, 8080);
+                socket =  new Socket("127.0.0.1", 6666);
+                out = new DataOutputStream(socket.getOutputStream());
+                System.out.println("DEBUG PEDIDO STREAM!");
+                int roteID = Integer.valueOf(data);
+                l.lock();
+                String route = g.routeToString(routesMap.get(roteID));
+                l.unlock();
+                //System.out.println("DEBUG ROTA "+route);
+                out.writeUTF("6:"+data+":"+"STREAM!!");
+                out.flush();
+                Thread t = new Thread(new ServerVideo("127.0.0.1","/Users/luissobral/Desktop/LEI/4ano/ESR/ProgEx/Java/movie.Mjpeg"));
+                t.start();
             }
         } catch (IOException | InterruptedException e) {
-        e.printStackTrace();
-      }
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

@@ -48,31 +48,28 @@ public class OTToutput implements Runnable{
                 int next = -1;
 
                 if(nodes.length == 2){
-                  arr = new int[2];
-                  arr[0] = Integer.valueOf(nodes[0]);
-                  arr[1] = Integer.valueOf(nodes[1]);
+                    arr = new int[2];
+                    arr[0] = Integer.valueOf(nodes[0]);
+                    arr[1] = Integer.valueOf(nodes[1]);
 
                 }
                 if(nodes.length > 2){
-                  next = Integer.valueOf(nodes[2]);
-                  arr = new int[3];
-                  arr[0] = Integer.valueOf(nodes[0]);
-                  arr[1] = Integer.valueOf(nodes[1]);
-                  arr[2] = Integer.valueOf(nodes[2]);
+                    next = Integer.valueOf(nodes[2]);
+                    arr = new int[3];
+                    arr[0] = Integer.valueOf(nodes[0]);
+                    arr[1] = Integer.valueOf(nodes[1]);
+                    arr[2] = Integer.valueOf(nodes[2]);
+                    String[] nextRoute = route[1].split("-",2);
+                    //socket = new Socket(connMap.get(next), 8080);
+                    socket = new Socket("127.0.0.1", 5555);
+                    out = new DataOutputStream(socket.getOutputStream());
+                    out.writeUTF("4:"+routeID+":"+nextRoute[1]);
+                    out.flush();
+                    socket.close();
                 }
-
                 l.lock();
                 routesMap.put(Integer.valueOf(routeID),arr);
                 l.unlock();
-
-                if(nodes.length > 2){
-                  String[] nextRoute = route[1].split("-",2);
-                  socket = new Socket(connMap.get(next), 8080);
-                  out = new DataOutputStream(socket.getOutputStream());
-                  out.writeUTF("4:"+routeID+":"+nextRoute[1]);
-                  out.flush();
-                  socket.close();
-                }
             } else if(type.equals("2")) {
                 String[] c = data.split("-");
 
@@ -90,13 +87,39 @@ public class OTToutput implements Runnable{
                 System.out.println("DEBUG "+ newNode);
 
                 if(newNode != -1){
-                  socket = new Socket(connMap.get(newNode), 8080);
-                  out = new DataOutputStream(socket.getOutputStream());
-                  out.writeUTF("5:"+routeID);
-                  out.flush();
-                  socket.close();
-                  System.out.println("PACKET TYPE [5] SEND");
+                    //socket = new Socket(connMap.get(newNode), 8080);
+                    socket = new Socket("127.0.0.1", 5555);
+                    out = new DataOutputStream(socket.getOutputStream());
+                    out.writeUTF("5:"+routeID);
+                    out.flush();
+                    socket.close();
+                    System.out.println("PACKET TYPE [5] SEND");
                 }
+            } else if(type.equals("6")) {
+                String[] d = data.split(":",2);
+                int routeID = Integer.valueOf(d[0]);
+                int newNode = -1;
+                l.lock();
+                if(routesMap.containsKey(routeID) && routesMap.get(routeID).length > 2)
+                    newNode = routesMap.get(routeID)[2];
+                l.unlock();
+                System.out.println("DEBUG "+ newNode);
+
+                if(newNode != -1){
+                    //socket = new Socket(connMap.get(newNode), 8080);
+                    socket = new Socket("127.0.0.1", 5555);
+                    out = new DataOutputStream(socket.getOutputStream());
+                    out.writeUTF("6:"+routeID);
+                    out.flush();
+                    socket.close();
+                    System.out.println("PACKET TYPE [5] SEND");
+                    Thread t = new Thread(new OTTVideo(ip,connMap.get(newNode)));
+                    t.start();
+                } else{
+                    Thread t = new Thread(new ClientVideo());
+                    t.start();
+                }
+                    //System.out.println(d[1]);
             }
         } catch (IOException e) {
             e.printStackTrace();

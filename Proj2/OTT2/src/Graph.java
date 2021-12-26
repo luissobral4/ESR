@@ -1,4 +1,5 @@
 import java.io.BufferedReader;
+import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
@@ -48,9 +49,9 @@ public class Graph {
         for(int i = 0;i < size - 1;i++)
             r = r + route[i]+"-";
 
-          r = r + route[size - 1];
+        r = r + route[size - 1];
 
-          return r;
+        return r;
     }
 
 
@@ -105,18 +106,18 @@ public class Graph {
 
     public int getClient(String ip) {
         for(Map.Entry<String, Integer> ent : clientNodeMap.entrySet()){
-          if(ip.equals(ent.getKey()))
-              return ent.getValue();
+            if(ip.equals(ent.getKey()))
+                return ent.getValue();
         }
         return -1;
     }
 
     public int getNode(String ip) {
         for(Map.Entry<String, Integer> ent : nodeIpMap.entrySet()){
-          if(ip.equals(ent.getKey()))
-              return ent.getValue();
+            if(ip.equals(ent.getKey()))
+                return ent.getValue();
         }
-              return -1;
+        return -1;
     }
 
     public int[] getOTT(){

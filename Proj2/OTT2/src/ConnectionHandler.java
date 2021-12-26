@@ -18,7 +18,8 @@ public class ConnectionHandler implements Runnable{
     public void run() {
         ServerSocket server = null;
         try {
-            server = new ServerSocket(8080);
+            //server = new ServerSocket(8080);
+            server = new ServerSocket(5555);
             System.out.println("[Server] - LISTENING!");
 
             while (true) {

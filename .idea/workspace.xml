@@ -2,44 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="6735b2ff-4888-4fe2-bfd3-ac23f67b3bba" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/OverlayController/ClientTest.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/OverlayNode/OutTest3.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Util/teste2" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/TP3/OverlayController/DataAccessControl.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/TP3/OverlayController/DataAccessControl.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/TP3/OverlayController/Graph$Dijkstra.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/TP3/OverlayController/Graph$Dijkstra.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/TP3/OverlayController/Graph$Edge.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/TP3/OverlayController/Graph$Edge.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/TP3/OverlayController/Graph$Vertex.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/TP3/OverlayController/Graph$Vertex.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/TP3/OverlayController/Graph.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/TP3/OverlayController/Graph.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/TP3/OverlayController/NodeHandler.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/TP3/OverlayController/NodeHandler.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/TP3/OverlayController/NodeListener.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/TP3/OverlayController/NodeListener.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/TP3/OverlayController/RequestHandler.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/TP3/OverlayController/RequestHandler.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/TP3/OverlayController/RequestListener.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/TP3/OverlayNode/ControllerTest.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/TP3/OverlayNode/ControllerTest.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/TP3/OverlayNode/FluxConnection.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/TP3/OverlayNode/FluxConnection.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/TP3/OverlayNode/FluxConnectionInput.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/TP3/OverlayNode/FluxConnectionInput.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/TP3/OverlayNode/FluxConnectionOutput.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/TP3/OverlayNode/FluxConnectionOutput.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/TP3/OverlayNode/FluxControl.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/TP3/OverlayNode/FluxControl.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/TP3/OverlayNode/OverlayNode.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/TP3/OverlayNode/OverlayNode.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/TP3/OverlayNode/TableUpdatesControl.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/TP3/OverlayNode/TableUpdatesControl.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/TP3/Util/Address.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/TP3/Util/Address.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/TP3/Util/teste.txt" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/TP3/Util/teste.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/OverlayController/DataAccessControl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/OverlayController/DataAccessControl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/OverlayController/Graph.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/OverlayController/Graph.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/OverlayController/NodeHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/OverlayController/NodeHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/OverlayController/NodeListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/OverlayController/NodeListener.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/OverlayController/OverlayController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/OverlayController/OverlayController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/OverlayController/RequestHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/OverlayController/RequestHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/OverlayController/RequestListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/OverlayController/ClientListener.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/OverlayNode/ControllerTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/OverlayNode/ControllerTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/OverlayNode/FluxConnection.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/OverlayNode/FluxConnection.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/OverlayNode/FluxConnectionInput.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/OverlayNode/FluxConnectionInput.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/OverlayNode/FluxConnectionOutput.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/OverlayNode/FluxConnectionOutput.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/OverlayNode/FluxControl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/OverlayNode/FluxControl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/OverlayNode/OverlayNode.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/OverlayNode/OverlayNode.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/OverlayNode/TableUpdatesControl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/OverlayNode/TableUpdatesControl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Util/Address.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Util/Address.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Util/teste.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/Util/teste.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Help/movie.Mjpeg" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -59,13 +24,14 @@
   <component name="ProjectId" id="21K9zghEvyMdWWxFTYAc7Sp29kG" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
-    <option name="showExcludedFiles" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/src" />
+    <property name="node.js.path.for.package.tslint" value="project" />
+    <property name="node.js.selected.package.tslint" value="(autodetect)" />
     <property name="project.structure.last.edited" value="Modules" />
     <property name="project.structure.proportion" value="0.0" />
     <property name="project.structure.side.proportion" value="0.0" />
@@ -184,18 +150,6 @@
         <item itemvalue="Application.OutTest1" />
       </list>
     </recent_temporary>
-  </component>
-  <component name="ServiceViewManager">
-    <option name="viewStates">
-      <list>
-        <serviceView>
-          <treeState>
-            <expand />
-            <select />
-          </treeState>
-        </serviceView>
-      </list>
-    </option>
   </component>
   <component name="SpellCheckerSettings" BundledDictionaries="3" BundledDictionary0="android.dic" BundledDictionary1="jetbrains.dic" BundledDictionary2="english.dic" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" Dictionaries="0" CorrectionsLimit="5" DefaultDictionary="project-level" UseSingleDictionary="true" />
   <component name="SvnConfiguration">
@@ -991,7 +945,7 @@
         <line-breakpoint enabled="true" type="java-method">
           <url>file://$PROJECT_DIR$/src/OverlayNode/FluxControl.java</url>
           <line>130</line>
-          <properties class="OverlayNode.FluxControl" method="waitNewPacket">
+          <properties class="OverlayNode.FluxControl">
             <option name="EMULATED" value="true" />
           </properties>
           <option name="timeStamp" value="258" />
@@ -999,7 +953,7 @@
         <line-breakpoint enabled="true" type="java-method">
           <url>file://$PROJECT_DIR$/src/OverlayNode/FluxControl.java</url>
           <line>106</line>
-          <properties class="OverlayNode.FluxControl" method="packetSent">
+          <properties class="OverlayNode.FluxControl">
             <option name="EMULATED" value="true" />
           </properties>
           <option name="timeStamp" value="267" />
@@ -1007,7 +961,7 @@
         <line-breakpoint enabled="true" type="java-method">
           <url>file://$PROJECT_DIR$/src/OverlayNode/FluxControl.java</url>
           <line>140</line>
-          <properties class="OverlayNode.FluxControl" method="waitAllSent">
+          <properties class="OverlayNode.FluxControl">
             <option name="EMULATED" value="true" />
           </properties>
           <option name="timeStamp" value="285" />
@@ -1015,7 +969,7 @@
         <line-breakpoint enabled="true" type="java-method">
           <url>file://$PROJECT_DIR$/src/OverlayController/DataAccessControl.java</url>
           <line>232</line>
-          <properties class="OverlayController.DataAccessControl" method="nodeAdd">
+          <properties class="OverlayController.DataAccessControl">
             <option name="EMULATED" value="true" />
           </properties>
           <option name="timeStamp" value="294" />
@@ -1023,7 +977,7 @@
         <line-breakpoint enabled="true" type="java-method">
           <url>file://$PROJECT_DIR$/src/OverlayController/NodeHandler.java</url>
           <line>12</line>
-          <properties class="OverlayController.NodeHandler" method="&lt;init&gt;">
+          <properties class="OverlayController.NodeHandler">
             <option name="EMULATED" value="true" />
           </properties>
           <option name="timeStamp" value="341" />
@@ -1031,7 +985,7 @@
         <line-breakpoint enabled="true" type="java-method">
           <url>file://$PROJECT_DIR$/src/OverlayController/RequestHandler.java</url>
           <line>13</line>
-          <properties class="OverlayController.RequestHandler" method="&lt;init&gt;">
+          <properties class="OverlayController.RequestHandler">
             <option name="EMULATED" value="true" />
           </properties>
           <option name="timeStamp" value="345" />

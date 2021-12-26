@@ -12,7 +12,8 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class Server {
     public static void main(String[] args) throws IOException, InterruptedException {
-        Graph g = Graph.importGraph( "/home/core/Desktop/OTT/teste.txt");
+        //Graph g = Graph.importGraph( "/home/core/Desktop/OTT/teste.txt");
+        Graph g = Graph.importGraph( "/Users/luissobral/OTT/src/teste2.txt");
         HashMap<Integer,int[]> routes = new HashMap<>();
         ReentrantLock l = new ReentrantLock();
         BlockingQueue queue = new ArrayBlockingQueue(1024);
@@ -23,13 +24,13 @@ public class Server {
         //TimeUnit.SECONDS.sleep(10);
 
         while(true){
-          if(queue.isEmpty())
-            TimeUnit.SECONDS.sleep(1);
-          else {
-            String packet = (String) queue.take();
-            Thread tqr = new Thread(new QueueResponder(queue,g,routes,l,packet));
-            tqr.start();
-          }
+            if(queue.isEmpty())
+                TimeUnit.SECONDS.sleep(1);
+            else {
+                String packet = (String) queue.take();
+                Thread tqr = new Thread(new QueueResponder(queue,g,routes,l,packet));
+                tqr.start();
+            }
         }
     }
 

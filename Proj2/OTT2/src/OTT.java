@@ -20,7 +20,8 @@ public class OTT {
         HashMap<Integer,int[]> routesMap = new HashMap<>();
 
         //pedir vizinhos
-        Socket socket = new Socket(args[0], 8080);
+        //Socket socket = new Socket(args[0], 8080);
+        Socket socket = new Socket("127.0.0.1", 5555);
         DataOutputStream out = new DataOutputStream(socket.getOutputStream());
         out.writeUTF("1:d");
         out.flush();
@@ -30,17 +31,17 @@ public class OTT {
         tin.start();
 
         if(args.length > 1){
-          Thread tr = new Thread(new OTTRequests(queue,routesMap,l));
-          tr.start();
+            Thread tr = new Thread(new OTTRequests(queue,routesMap,l));
+            tr.start();
         }
 
         while(true){
             if(queue.isEmpty())
-              TimeUnit.SECONDS.sleep(1);
+                TimeUnit.SECONDS.sleep(1);
             else {
-              String obj = (String) queue.take();
-              Thread tout = new Thread(new OTToutput(queue,routesMap,l,obj,connMap));
-              tout.start();
+                String obj = (String) queue.take();
+                Thread tout = new Thread(new OTToutput(queue,routesMap,l,obj,connMap));
+                tout.start();
             }
         }
     }
