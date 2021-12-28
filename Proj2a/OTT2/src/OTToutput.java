@@ -84,7 +84,8 @@ public class OTToutput implements Runnable{
             }
             //pedido de stream para o servidor
             else if(type.equals("5")) {
-                int routeID = Integer.valueOf(data);
+                String[] d = data.split(":",2);
+                int routeID = Integer.valueOf(d[1]);
                 int newNode = -1;
                 l.lock();
                 if(routesMap.containsKey(routeID))
@@ -95,7 +96,7 @@ public class OTToutput implements Runnable{
                 if(newNode != -1){
                     socket = new Socket(connMap.get(newNode), 8080);
                     out = new DataOutputStream(socket.getOutputStream());
-                    out.writeUTF("5:"+routeID);
+                    out.writeUTF("5:"+data);
                     out.flush();
                     socket.close();
                     System.out.println("PACKET TYPE [5] SEND");
@@ -137,7 +138,7 @@ public class OTToutput implements Runnable{
                         System.out.println("PACKET TYPE [6]");
                     }
                 } else{
-                    Thread t = new Thread(new ClientVideo());
+                    Thread t = new Thread(new ClientVideo(streamID));
                     t.start();
                 }
                     //System.out.println(d[1]);

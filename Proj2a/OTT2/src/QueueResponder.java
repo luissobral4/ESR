@@ -89,8 +89,6 @@ public class QueueResponder implements Runnable{
              //responder a pedido de stream
             } else if(type.equals("5")){
                 String[] streamR = data.split(":",2);
-                socket = new Socket(ip, 8080);
-                out = new DataOutputStream(socket.getOutputStream());
                 System.out.println("DEBUG PEDIDO STREAM!");
                 int routeID = Integer.valueOf(streamR[1]);
                 int streamID = Integer.valueOf(streamR[0]);
@@ -109,8 +107,11 @@ public class QueueResponder implements Runnable{
                 }
 
                 if(!rote) {
+                    socket = new Socket(ip, 8080);
+                    out = new DataOutputStream(socket.getOutputStream());
                     out.writeUTF("6:" + data);
                     out.flush();
+                    socket.close();
                 } else System.out.println("ROTE EXISTS");
             }
         } catch (IOException e){//| InterruptedException e) {

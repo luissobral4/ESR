@@ -48,7 +48,7 @@ public class OTTRequests implements Runnable{
         try {
             while(true){
                 System.out.println("1. Pedir Stream\n2. Pedir Stream\n3. Pedir rota");
-                int command = lerInt(">>",1,2);
+                int command = lerInt(">>",1,3);
                 if(command == 1) {
                   int roteID = -1;
                   l.lock();
