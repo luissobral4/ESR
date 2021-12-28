@@ -112,38 +112,8 @@ public class OTTVideo extends JFrame implements Runnable {
         catch (IOException ioe) {
             System.out.println("Exception caught: "+ioe);
         }
-
       }
+      streams.removeStream(streamID);
 
     }
-
-
-    class clientTimerListener implements ActionListener {
-        public void actionPerformed(ActionEvent e) {
-
-            //Construct a DatagramPacket to receive data from the UDP socket
-            rcvdp = new DatagramPacket(sBuf, sBuf.length);
-
-            try{
-                //receive the DP from the socket:
-                RTPsocket.receive(rcvdp);
-
-                //create an RTPpacket object from the DP
-                RTPpacket rtp_packet = new RTPpacket(rcvdp.getData(), rcvdp.getLength());
-
-                //print important header fields of the RTP packet received:
-                System.out.println("Got RTP packet with SeqNum # "+rtp_packet.getsequencenumber()+" TimeStamp "+rtp_packet.gettimestamp()+" ms, of type "+rtp_packet.getpayloadtype());
-
-                //print header bitstream:
-                rtp_packet.printheader();
-
-                //send datagram packet
-                RTPsocket.send(rcvdp);
-
-            }
-            catch (IOException ioe) {
-                System.out.println("Exception caught: "+ioe);
-            }
-        }
-    }
-}//end of Class Servidor
+}

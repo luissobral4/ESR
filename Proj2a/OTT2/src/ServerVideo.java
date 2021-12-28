@@ -155,6 +155,7 @@ public class ServerVideo extends JFrame implements ActionListener, Runnable {
         {
             //if we have reached the end of the video file, stop the timer
             sTimer.stop();
+            streams.removeStream(streamID);
         }
     }
 

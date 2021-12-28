@@ -59,4 +59,13 @@ public class Streams {
 
         return ips;
     }
+
+    public void removeStream(int streamID){
+        lStream.lock();
+        streams.remove(streamID);
+        lStream.unlock();
+        lIP.lock();
+        streamIP.remove(streamID);
+        lIP.unlock();
+    }
 }
