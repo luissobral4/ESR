@@ -18,6 +18,7 @@ public class OTT {
         BlockingQueue queue = new ArrayBlockingQueue(1024);
         ReentrantLock l = new ReentrantLock();
         HashMap<Integer,int[]> routesMap = new HashMap<>();
+        Streams streams = new Streams();
 
         //pedir vizinhos
         Socket socket = new Socket(args[0], 8080);
@@ -41,7 +42,7 @@ public class OTT {
                 TimeUnit.SECONDS.sleep(1);
             else {
                 String obj = (String) queue.take();
-                Thread tout = new Thread(new OTToutput(queue,routesMap,l,obj,connMap));
+                Thread tout = new Thread(new OTToutput(queue,routesMap,l,obj,connMap,streams));
                 tout.start();
             }
         }

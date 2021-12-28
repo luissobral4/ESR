@@ -18,6 +18,8 @@ public class OTTVideo extends JFrame implements Runnable {
     DatagramSocket RTPsocket; //socket to be used to receive UDP packet
     int RTP_dest_port = 25000; //destination port for RTP packets
     InetAddress ClientIPAddr; //Client IP address
+    Streams streams;
+    int streamID;
 
     //Video constants:
     //------------------
@@ -33,17 +35,20 @@ public class OTTVideo extends JFrame implements Runnable {
     //--------------------------
     //Constructor
     //--------------------------
-    public OTTVideo(String ip) {
+    public OTTVideo(Streams streams,int streamID) {
         //init para a parte do cliente
         //--------------------------
         //sTimer = new Timer(20, new clientTimerListener());
         //sTimer.setInitialDelay(0);
         //sTimer.setCoalesce(true);
+        this.streams = streams;
+        this.streamID = streamID;
+        this.RTP_dest_port += streamID;
         sBuf = new byte[15000]; //allocate enough memory for the buffer used to receive data from the server
 
         try {
             RTPsocket = new DatagramSocket(RTP_dest_port); //init RTP socket
-            ClientIPAddr = InetAddress.getByName(ip);
+            //ClientIPAddr = InetAddress.getByName(ip);
 
         } catch (SocketException e) {
             System.out.println("Servidor: erro no socket: " + e.getMessage());
@@ -93,11 +98,15 @@ public class OTTVideo extends JFrame implements Runnable {
             byte[] packet_bits = new byte[packet_length];
             rtp_packet.getpacket(packet_bits);
 
-            //send the packet as a DatagramPacket over the UDP socket
-            senddp = new DatagramPacket(packet_bits, packet_length, ClientIPAddr, RTP_dest_port);
+            ArrayList<String> dest = streams.getStreamDest(streamID);
 
-            //send datagram packet
-            RTPsocket.send(senddp);
+            for (String ip:dest) {
+                InetAddress ClientIPAddr = InetAddress.getByName(ip);
+                //send the packet as a DatagramPacket over the UDP socket
+                senddp = new DatagramPacket(packet_bits, packet_length, ClientIPAddr, RTP_dest_port);
+                //send datagram packet
+                RTPsocket.send(senddp);
+            }
 
         }
         catch (IOException ioe) {

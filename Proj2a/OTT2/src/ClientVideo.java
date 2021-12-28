@@ -32,7 +32,8 @@ public class ClientVideo implements Runnable{
     //--------------------------
     //Constructor
     //--------------------------
-    public ClientVideo() {
+    public ClientVideo(int streamID) {
+        this.RTP_RCV_PORT += streamID;
         //Frame
         f.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {

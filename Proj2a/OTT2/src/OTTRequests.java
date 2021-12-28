@@ -47,7 +47,7 @@ public class OTTRequests implements Runnable{
     public void run() {
         try {
             while(true){
-                System.out.println("1. Pedir Stream\n2. Pedir rota");
+                System.out.println("1. Pedir Stream\n2. Pedir Stream\n3. Pedir rota");
                 int command = lerInt(">>",1,2);
                 if(command == 1) {
                   int roteID = -1;
@@ -60,10 +60,24 @@ public class OTTRequests implements Runnable{
                   l.unlock();
 
                   if(roteID != -1){
-                    queue.put("ip:5:"+roteID);
+                    queue.put("ip:5:1:"+roteID);
                   } else
                     System.out.println("SEM ROTAS DISPONIVEIS!");
-                } else if (command == 2) {
+                }else if(command == 2) {
+                    int roteID = -1;
+                    l.lock();
+                    if(routesMap.size() > 0){
+                        Set<Integer> s = routesMap.keySet();
+                        for(int i:s)
+                            roteID = i;
+                    }
+                    l.unlock();
+
+                    if(roteID != -1){
+                        queue.put("ip:5:2:"+roteID);
+                    } else
+                        System.out.println("SEM ROTAS DISPONIVEIS!");
+                }else if (command == 3) {
                   try {
                     Socket socket = new Socket(serverIP, 8080);
                     DataOutputStream out = new DataOutputStream(socket.getOutputStream());

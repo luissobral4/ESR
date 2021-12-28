@@ -17,6 +17,9 @@ public class Server {
         HashMap<Integer,int[]> routes = new HashMap<>();
         ReentrantLock l = new ReentrantLock();
         BlockingQueue queue = new ArrayBlockingQueue(1024);
+        //HashMap<Integer,TreeSet<String>> streams = new HashMap<>();
+        //ReentrantLock lStream = new ReentrantLock();
+        Streams streams = new Streams();
 
         Thread ch = new Thread(new ConnectionHandler(queue));
         ch.start();
@@ -28,7 +31,7 @@ public class Server {
                 TimeUnit.SECONDS.sleep(1);
             else {
                 String packet = (String) queue.take();
-                Thread tqr = new Thread(new QueueResponder(queue,g,routes,l,packet));
+                Thread tqr = new Thread(new QueueResponder(queue,g,routes,l,packet,streams));
                 tqr.start();
             }
         }

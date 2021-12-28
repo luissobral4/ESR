@@ -16,13 +16,15 @@ public class OTToutput implements Runnable{
     private ReentrantLock l;
     private String packet;
     private HashMap<Integer,String> connMap;
+    private Streams streams;
 
-    public OTToutput(BlockingQueue queue,HashMap<Integer,int[]> routesMap,ReentrantLock l,String packet,HashMap<Integer,String> connMap){
+    public OTToutput(BlockingQueue queue,HashMap<Integer,int[]> routesMap,ReentrantLock l,String packet,HashMap<Integer,String> connMap,Streams streams){
         this.queue = queue;
         this.routesMap = routesMap;
         this.l = l;
         this.packet = packet;
         this.connMap = connMap;
+        this.streams = streams;
     }
 
     @Override
@@ -92,7 +94,6 @@ public class OTToutput implements Runnable{
 
                 if(newNode != -1){
                     socket = new Socket(connMap.get(newNode), 8080);
-                    //socket = new Socket("127.0.0.1", 5555);
                     out = new DataOutputStream(socket.getOutputStream());
                     out.writeUTF("5:"+routeID);
                     out.flush();
@@ -103,7 +104,8 @@ public class OTToutput implements Runnable{
             //transmissao stream
             else if(type.equals("6")) {
                 String[] d = data.split(":",2);
-                int routeID = Integer.valueOf(d[0]);
+                int routeID = Integer.valueOf(d[1]);
+                int streamID = Integer.valueOf(d[0]);
                 int newNode = -1;
                 l.lock();
                 if(routesMap.containsKey(routeID) && routesMap.get(routeID).length > 2)
@@ -111,15 +113,29 @@ public class OTToutput implements Runnable{
                 l.unlock();
 
                 if(newNode != -1){
-                    socket = new Socket(connMap.get(newNode), 8080);
-                    //socket = new Socket("127.0.0.1", 5555);
-                    out = new DataOutputStream(socket.getOutputStream());
-                    out.writeUTF("6:"+routeID);
-                    out.flush();
-                    socket.close();
-                    System.out.println("PACKET TYPE [6]");
-                    Thread t = new Thread(new OTTVideo(connMap.get(newNode)));
-                    t.start();
+                    boolean currentStream =  streams.currentStream(streamID);
+                    boolean route = false;
+                    String newIp = connMap.get(newNode);
+
+                    if(!currentStream) {
+                        streams.addStream(streamID, routeID, newIp);
+                        Thread t = new Thread(new OTTVideo(streams, streamID));
+                        t.start();
+                    }
+                    else {
+                        route = streams.containsRote(streamID,routeID);
+                        if(!route)
+                            streams.addStreamRote(streamID,routeID,newIp);
+                    }
+
+                    if(!route) {
+                        socket = new Socket(connMap.get(newNode), 8080);
+                        out = new DataOutputStream(socket.getOutputStream());
+                        out.writeUTF("6:" + data);
+                        out.flush();
+                        socket.close();
+                        System.out.println("PACKET TYPE [6]");
+                    }
                 } else{
                     Thread t = new Thread(new ClientVideo());
                     t.start();

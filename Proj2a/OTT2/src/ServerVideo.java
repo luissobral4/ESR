@@ -1,10 +1,18 @@
-import java.io.*;
-import java.net.*;
-import java.awt.*;
-import java.util.*;
-import java.awt.event.*;
 import javax.swing.*;
-import javax.swing.Timer;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.File;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.SocketException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.TreeSet;
+import java.util.concurrent.locks.ReentrantLock;
 
 
 public class ServerVideo extends JFrame implements ActionListener, Runnable {
@@ -17,6 +25,8 @@ public class ServerVideo extends JFrame implements ActionListener, Runnable {
     DatagramSocket RTPsocket; //socket to be used to send and receive UDP packet
     int RTP_dest_port = 25000; //destination port for RTP packets
     InetAddress ClientIPAddr; //Client IP address
+    Streams streams;
+    int streamID;
 
     static String VideoFileName; //video file to request to the server
 
@@ -34,14 +44,18 @@ public class ServerVideo extends JFrame implements ActionListener, Runnable {
     //--------------------------
     //Constructor
     //--------------------------
-    public ServerVideo(String ip, String fileName) {
+    public ServerVideo(Streams streams, int streamID) {
         //init Frame
         super("Servidor");
 
         //get video filename to request:
-        //VideoFileName = "/Users/luissobral/Desktop/LEI/4ano/ESR/ProgEx/Java/movie.Mjpeg";
-        VideoFileName = fileName;
-        //System.out.println("Servidor: parametro não foi indicado. VideoFileName = " + VideoFileName);
+        if(streamID == 1)
+            VideoFileName = "/home/core/Desktop/Proj2/OTT2/movie.Mjpeg";
+        if(streamID == 2)
+            VideoFileName = "/home/core/Desktop/Proj2/OTT2/movie.Mjpeg";
+        this.streams = streams;
+        this.streamID = streamID;
+        this.RTP_dest_port += streamID;
 
         File f = new File(VideoFileName);
         if (!f.exists())
@@ -55,7 +69,7 @@ public class ServerVideo extends JFrame implements ActionListener, Runnable {
 
         try {
             //ClientIPAddr = InetAddress.getByName("127.0.0.1");
-            ClientIPAddr = InetAddress.getByName(ip);
+            //ClientIPAddr = InetAddress.getByName(ip);
             RTPsocket = new DatagramSocket(RTP_dest_port); //init RTP socket
             System.out.println("Servidor: socket " + ClientIPAddr);
             video = new VideoStream(VideoFileName); //init the VideoStream object:
@@ -115,9 +129,14 @@ public class ServerVideo extends JFrame implements ActionListener, Runnable {
                 byte[] packet_bits = new byte[packet_length];
                 rtp_packet.getpacket(packet_bits);
 
-                //send the packet as a DatagramPacket over the UDP socket
-                senddp = new DatagramPacket(packet_bits, packet_length, ClientIPAddr, RTP_dest_port);
-                RTPsocket.send(senddp);
+                ArrayList<String> dest = streams.getStreamDest(streamID);
+
+                for (String ip:dest) {
+                    //send the packet as a DatagramPacket over the UDP socket
+                    InetAddress ClientIPAddr = InetAddress.getByName(ip);
+                    senddp = new DatagramPacket(packet_bits, packet_length, ClientIPAddr, RTP_dest_port);
+                    RTPsocket.send(senddp);
+                }
 
                 System.out.println("Send frame #"+imagenb);
                 //print the header bitstream

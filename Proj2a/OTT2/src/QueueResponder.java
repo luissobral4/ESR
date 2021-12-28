@@ -3,8 +3,7 @@ import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.io.DataOutputStream;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.locks.Lock;
@@ -15,14 +14,16 @@ public class QueueResponder implements Runnable{
     private Graph g;
     private HashMap<Integer,int[]> routesMap;
     private ReentrantLock l;
+    private Streams streams;
     private String packet;
 
-    public QueueResponder(BlockingQueue queue,Graph g,HashMap<Integer,int[]> routes,ReentrantLock l,String packet){
+    public QueueResponder(BlockingQueue queue,Graph g,HashMap<Integer,int[]> routes,ReentrantLock l,String packet, Streams streams){
         this.queue = queue;
         this.g = g;
         this.routesMap = routes;
         this.l = l;
         this.packet = packet;
+        this.streams = streams;
     }
 
     @Override
@@ -87,20 +88,30 @@ public class QueueResponder implements Runnable{
                 socket.close();
              //responder a pedido de stream
             } else if(type.equals("5")){
+                String[] streamR = data.split(":",2);
                 socket = new Socket(ip, 8080);
-                //socket =  new Socket("127.0.0.1", 6666);
                 out = new DataOutputStream(socket.getOutputStream());
                 System.out.println("DEBUG PEDIDO STREAM!");
-                int roteID = Integer.valueOf(data);
-                l.lock();
-                String route = g.routeToString(routesMap.get(roteID));
-                l.unlock();
-                System.out.println("DEBUG stream sended ");
-                out.writeUTF("6:"+data);
-                out.flush();
-                //Thread t = new Thread(new ServerVideo("127.0.0.1","/Users/luissobral/Desktop/LEI/4ano/ESR/ProgEx/Java/movie.Mjpeg"));
-                Thread t = new Thread(new ServerVideo(ip,"/home/core/Desktop/Proj2/OTT2/movie.Mjpeg"));
-                t.start();
+                int routeID = Integer.valueOf(streamR[1]);
+                int streamID = Integer.valueOf(streamR[0]);
+                boolean currentStream =  streams.currentStream(streamID);
+                boolean rote = false;
+
+                if(!currentStream) {
+                    streams.addStream(streamID, routeID, ip);
+                    Thread t = new Thread(new ServerVideo(streams, streamID));
+                    t.start();
+                }
+                else {
+                    rote = streams.containsRote(streamID,routeID);
+                    if(!rote)
+                        streams.addStreamRote(streamID,routeID,ip);
+                }
+
+                if(!rote) {
+                    out.writeUTF("6:" + data);
+                    out.flush();
+                } else System.out.println("ROTE EXISTS");
             }
         } catch (IOException e){//| InterruptedException e) {
             e.printStackTrace();
